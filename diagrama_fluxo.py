@@ -35,20 +35,6 @@ num_sinais = int(input('\nO Sistema possui quantos sinais? '))
 # ==================================================
 # FUNÇÕES DE INTERFACE
 
-# menu de seleção dos sinais, usado para adicionar ou remover conexões:
-def menu_sinal():
-    os.system('cls')
-
-    print('CONFIGURAÇÃO DO SINAL')
-    print('''
-1 - Adicionar Conexão
-2 - Editar Conexões
-3 - Remover Conexão
-4 - Voltar
-    ''');
-
-    return int(input('\nEscolha uma opção: '));
-
 # exibe menu principal:
 def exibe_menu():
     os.system('cls')
@@ -69,17 +55,22 @@ def exibe_menu():
 # EXECUÇÃO DO PROGRAMA
 
 print('\nCriando Sistema...'); time.sleep(0.2)
+os.system('cls')
+
 sistema = Sistema(num_sinais)
 
-print('''Para adicionar novas conexões, utilize a simbologia a seguir:
-
+print('Para adicionar novas conexões, utilize a simbologia a seguir:')
+print('''
     1>2: indica um caminho do sinal 1 para o sinal 2;
     2>1: indica um laço de realimentação do sinal 2 para o sinal 1.
 
-        ''')
+''')
+
 conex = input('Insira as conexões a serem adicionadas, separadas por vírgula:\n')
 
 sistema.adiciona_conexao(conex)
+
+sistema.setup()
 
 opc = 0
 while True:
