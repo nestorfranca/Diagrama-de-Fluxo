@@ -34,12 +34,10 @@ class Sistema:
         matriz_up = self.matriz.upper_triangular()
 
         caminhos = []
-        lacos = []
         # Começar a busca do nó 0
         encontra_caminho(matriz_up, 0, [], caminhos)
                     
         self.caminhos = caminhos
-        self.lacos = lacos
 
     # atualiza a lista de lacos:
     def atualiza_lacos(self):
@@ -182,41 +180,47 @@ Matriz:
 
 
 def encontra_caminho(matriz, inicio, caminho, caminhos):
+    
+    # armazenamos o vértice atual:
     caminho.append(inicio)
 
-    # Se chegamos ao último nó, armazenamos o caminho e o ganho
-    if inicio == matriz.shape[0] - 1:
+    # se for igual ao último vértice, armazenamos o caminho
+    if inicio == matriz.rows-1:
         caminhos.append(list(caminho))
     else:
 
-        # Percorrer todos os nós possíveis
-        for prox_no in range(matriz.shape[1]):
-            if matriz[inicio, prox_no] != 0 and prox_no not in caminho:
-                    encontra_caminho(matriz, prox_no, caminho, caminhos)
+        # percorre todos os vértices, em todos os caminhos possíveis:
+        for prox in range(matriz.cols):
+            if matriz[inicio, prox] != 0 and prox not in caminho:
+                    encontra_caminho(matriz, prox, caminho, caminhos)
                     
-    # Remover o nó atual para permitir outras combinações
+    # remover o vértice atual para permitir outras combinações
     caminho.pop()
 
 
 def encontra_laco(matriz, inicio, laco, lacos):
 
-    # Se chegamos ao último nó, armazenamos o laco e o ganho
+    # armazena o vértice atual:
     laco.append(inicio)
 
-    # Percorrer todos os nós possíveis
-    for prox_no in range(matriz.shape[1]):
-        if matriz[inicio, prox_no] != 0:
-            if prox_no not in laco:
-                encontra_laco(matriz, prox_no, laco, lacos)
+    # Percorree todos os vértices, em todos os caminhos possíveis:
+    for prox in range(matriz.shape[1]):
+        if matriz[inicio, prox] != 0:
+            if prox not in laco:
+                encontra_laco(matriz, prox, laco, lacos)
+            # se o próximo vértice estiver presente no vetor, então temos um laço:
             else:
-                i = laco.index(prox_no)
+                # encontra valor de origem do laço e remove os vértices anteriores a ele:
+                # Ex:  [0, 1, 2, 4, 5, 2] --> [2, 4, 5, 2]
+                i = laco.index(prox)
                 novo_laco = laco[i:]
-                novo_laco.append(prox_no)
+                novo_laco.append(prox)
 
                 # testa se laço já existe:
                 # if novo_laco not in lacos:
                 repetido = False
                 for lac in lacos:
+                    # testa com lista de valores sem repetição:
                     if set(novo_laco) == set(lac):
                         repetido = True
 
