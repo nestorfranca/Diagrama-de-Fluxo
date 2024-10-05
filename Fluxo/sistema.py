@@ -1,4 +1,5 @@
 from sympy import symbols, Matrix, pretty
+import time, os
 
 # Definindo variáveis simbólicas:
 s = symbols('s')
@@ -8,38 +9,111 @@ s = symbols('s')
 
 # declarando classe e seus métodos:
 class Sistema:
-    def __init__(self):
-        self.matriz = Matrix.zeros(2, 2) # matriz quadrada
-        self.sinais = {'R': 0, 'C': 1}
+    def __init__(self, num_sinais):
+        self.matriz = Matrix.zeros(num_sinais, num_sinais) # matriz quadrada
+        self.sinais = ['R', 'C']
         self.caminhos = []
         self.lacos = []
 
         # definindo caminho unitário entre entrada e saída:
-        self.matriz[0, 1] = 1
+        # self.matriz[0, 1] = 1
         self.setup()
     
     # atualiza a lista de sinais
     def atualiza_sinais(self):
+        # tamanho da matriz:
+        len_matriz = self.matriz.rows
+
         # adicionar os vértices entre 'R' e 'C':
-        if self.matriz.rows > len(self.sinais):
-            len_sinais = len(self.sinais)
-            self.sinais.insert(-1, ('V' + str(len_sinais)))
+        if len_matriz > len(self.sinais):
+            for i in range(2, len_matriz):
+                self.sinais.insert(-1, ('V' + str(i)))
 
-    # atualiza a lista de caminhos
+    # atualiza a lista de caminhos:
     def atualiza_caminhos(self):
-        pass
+        matriz_up = self.matriz.upper_triangular()
 
-    # atualiza a lista de lacos
+        caminhos = []
+        lacos = []
+        # Começar a busca do nó 0
+        encontra_caminho(matriz_up, 0, [], caminhos)
+                    
+        self.caminhos = caminhos
+        self.lacos = lacos
+
+    # atualiza a lista de lacos:
     def atualiza_lacos(self):
-        pass
+        lacos = []
+        # Começar a busca do nó 0
+        encontra_laco(self.matriz, 0, [], lacos)
+                    
+        self.lacos = lacos
 
-    #
+    # atualiza confirurações gerais:
     def setup(self):
         self.atualiza_sinais()
         self.atualiza_caminhos()
         self.atualiza_lacos()
 
-    #
+    # retorna a lista de sinais:
+    def listar_sinais(self):
+        return self.sinais
+    
+    # retorna a lista todos os ganhos de caminho à frente do sistema:
+    def lista_caminhos(self):
+        return self.caminhos
+
+    # retorna a lista todos os ganhos de laço do sistema:
+    def lista_lacos(self):
+        return self.lacos
+
+    # calcula a FT resultante do sistema e exibe resultado:
+    def calcula_FT(self):
+        pass
+
+    # informações gerais do sistema:
+    def status(self):
+        print(f'''INFORMAÇÕES DO SISTEMA
+              
+Sinais: {self.listar_sinais()}
+Caminhos: {self.caminhos}
+Laços: {self.lacos}
+
+Matriz:
+
+{pretty(self.matriz)}
+        ''')
+
+    # cria uma nova conexão entre sinais:
+    def adiciona_conexao(self, conexoes):
+
+        # remove os espaços em branco:
+        lista_sem_espacos = conexoes.strip().replace(' ', '')
+        
+        # testa se a entrada é válida:
+        for caractere in lista_sem_espacos:
+            # só permite passar números positivos e o caracter '>':
+            if not (caractere.isdigit() or caractere == '>' or caractere == ','):
+                print('Entrada Inválida!'); time.sleep(0.2)
+                return None
+        
+        # passando no teste, retomamos o processo:
+        
+        # separa as conexões:
+        lista_conexoes = lista_sem_espacos.split(',')
+
+        # adiciona cada um na sua posição:
+        for conexao in lista_conexoes:
+            sinal1, sinal2 = [int(num) for num in conexao.split('>')]
+            if ((sinal1-1) > self.matriz.rows-1 or (sinal2-1) > self.matriz.rows-1) or sinal1 == sinal2:
+                # print('Entrada Inválida!'); time.sleep(0.2)
+                # return
+                continue
+            
+            self.matriz[sinal1-1, sinal2-1] += 1
+    # ==================================================
+    # METODOS EM TESTE...
+    '''
     def adiciona_sinal(self, pos):
         novo_tam = self.matriz.rows + 1
 
@@ -66,36 +140,6 @@ class Sistema:
         self.matriz = nova_matriz
 
         self.setup()
-
-
-    # cria uma nova conexão entre sinais:
-    def adiciona_conexao(self, conexoes):
-
-        # remove os espaços em branco:
-        lista_sem_espacos = conexoes.strip().replace(' ', '')
-        
-        # testa se a entrada é válida:
-        for caractere in lista_sem_espacos:
-            # só permite passar números positivos e o caracter '>':
-            if not (caractere.isdigit() or caractere == '>'):
-                print('Entrada Inválida!')
-                return None
-        
-        # passando no teste, retomamos o processo:
-        
-        # separa as conexões:
-        lista_conexoes = lista_sem_espacos.split(',')
-
-        # adiciona cada um na sua posição:
-        for conexao in lista_conexoes:
-            sinal1, sinal2 = conexao.split('>')
-
-            if sinal1 > self.matriz.rows or sinal1 > self.matriz.rows:
-                print('Entrada Inválida!')
-                return
-            
-            self.matriz[sinal1, sinal2] += 1
-
 
     # determina um novo sistema entre sinais:
     def definir_sistema(self, sinal1, sinal2):
@@ -130,28 +174,54 @@ class Sistema:
     def remove_conexao(self, sinal1, sinal2):
         self.matriz[sinal1, sinal2] = 0
 
-        self.desenha_diagrama()
-
-    #
-    def listar_sinais(self):
-        print(self.sinais)
     
-    # busca e lista todos os ganhos de caminho à frente do sistema:
-    def lista_caminhos(self):
-        caminhos = []
-        
-        return caminhos
-
-    # busca e lista todos os ganhos de laço do sistema:
-    def lista_lacos(self):
-        lacos = []
-        
-        return lacos
-
     # desenha o diagrama (temp: desenha a matriz de fluxo):
     def desenha_diagrama(self):
         print(pretty(self.matriz))
+    '''
 
-    # calcula a FT resultante do sistema e exibe resultado:
-    def calcula_FT(self):
-        pass
+
+def encontra_caminho(matriz, inicio, caminho, caminhos):
+    caminho.append(inicio)
+
+    # Se chegamos ao último nó, armazenamos o caminho e o ganho
+    if inicio == matriz.shape[0] - 1:
+        caminhos.append(list(caminho))
+    else:
+
+        # Percorrer todos os nós possíveis
+        for prox_no in range(matriz.shape[1]):
+            if matriz[inicio, prox_no] != 0 and prox_no not in caminho:
+                    encontra_caminho(matriz, prox_no, caminho, caminhos)
+                    
+    # Remover o nó atual para permitir outras combinações
+    caminho.pop()
+
+
+def encontra_laco(matriz, inicio, laco, lacos):
+
+    # Se chegamos ao último nó, armazenamos o laco e o ganho
+    laco.append(inicio)
+
+    # Percorrer todos os nós possíveis
+    for prox_no in range(matriz.shape[1]):
+        if matriz[inicio, prox_no] != 0:
+            if prox_no not in laco:
+                encontra_laco(matriz, prox_no, laco, lacos)
+            else:
+                i = laco.index(prox_no)
+                novo_laco = laco[i:]
+                novo_laco.append(prox_no)
+
+                # testa se laço já existe:
+                # if novo_laco not in lacos:
+                repetido = False
+                for lac in lacos:
+                    if set(novo_laco) == set(lac):
+                        repetido = True
+
+                if not repetido:
+                    lacos.append(list(novo_laco))
+                    
+    # Remover o nó atual para permitir outras combinações
+    laco.pop()
