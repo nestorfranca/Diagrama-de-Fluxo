@@ -1,4 +1,5 @@
 from sympy import symbols, Matrix, pretty
+import time, os
 
 # Definindo variáveis simbólicas:
 s = symbols('s')
@@ -8,22 +9,24 @@ s = symbols('s')
 
 # declarando classe e seus métodos:
 class Sistema:
-    def __init__(self):
-        self.matriz = Matrix.zeros(2, 2) # matriz quadrada
-        self.sinais = {'R': 0, 'C': 1}
+    def __init__(self, num_sinais):
+        self.matriz = Matrix.zeros(num_sinais, num_sinais) # matriz quadrada
+        self.sinais = ['R', 'C']
         self.caminhos = []
         self.lacos = []
 
         # definindo caminho unitário entre entrada e saída:
-        self.matriz[0, 1] = 1
+        # self.matriz[0, 1] = 1
         self.setup()
     
     # atualiza a lista de sinais
     def atualiza_sinais(self):
+
+        len_matriz = self.matriz.rows
         # adicionar os vértices entre 'R' e 'C':
-        if self.matriz.rows > len(self.sinais):
-            len_sinais = len(self.sinais)
-            self.sinais.insert(-1, ('V' + str(len_sinais)))
+        if len_matriz > len(self.sinais):
+            for i in range(2, len_matriz):
+                self.sinais.insert(-1, ('V' + str(i)))
 
     # atualiza a lista de caminhos
     def atualiza_caminhos(self):
@@ -67,7 +70,6 @@ class Sistema:
 
         self.setup()
 
-
     # cria uma nova conexão entre sinais:
     def adiciona_conexao(self, conexoes):
 
@@ -77,8 +79,8 @@ class Sistema:
         # testa se a entrada é válida:
         for caractere in lista_sem_espacos:
             # só permite passar números positivos e o caracter '>':
-            if not (caractere.isdigit() or caractere == '>'):
-                print('Entrada Inválida!')
+            if not (caractere.isdigit() or caractere == '>' or caractere == ','):
+                print('Entrada Inválida!'); time.sleep(0.2)
                 return None
         
         # passando no teste, retomamos o processo:
@@ -88,14 +90,13 @@ class Sistema:
 
         # adiciona cada um na sua posição:
         for conexao in lista_conexoes:
-            sinal1, sinal2 = conexao.split('>')
-
-            if sinal1 > self.matriz.rows or sinal1 > self.matriz.rows:
-                print('Entrada Inválida!')
-                return
+            sinal1, sinal2 = [int(num) for num in conexao.split('>')]
+            if ((sinal1-1) > self.matriz.rows-1 or (sinal2-1) > self.matriz.rows-1) or sinal1 == sinal2:
+                # print('Entrada Inválida!'); time.sleep(0.2)
+                # return
+                continue
             
-            self.matriz[sinal1, sinal2] += 1
-
+            self.matriz[sinal1-1, sinal2-1] += 1
 
     # determina um novo sistema entre sinais:
     def definir_sistema(self, sinal1, sinal2):
@@ -130,8 +131,6 @@ class Sistema:
     def remove_conexao(self, sinal1, sinal2):
         self.matriz[sinal1, sinal2] = 0
 
-        self.desenha_diagrama()
-
     #
     def listar_sinais(self):
         print(self.sinais)
@@ -155,3 +154,15 @@ class Sistema:
     # calcula a FT resultante do sistema e exibe resultado:
     def calcula_FT(self):
         pass
+
+    def status(self):
+        print(f'''INFORMAÇÕES DO SISTEMA
+              
+Sinais: {self.sinais}
+Caminhos: {len(self.caminhos)}
+Laços: {len(self.lacos)}
+
+Matriz:
+
+{pretty(self.matriz)}
+        ''')
