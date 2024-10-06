@@ -11,7 +11,7 @@ s = symbols('s')
 class Sistema:
     def __init__(self, num_sinais):
         self.matriz = Matrix.zeros(num_sinais, num_sinais) # matriz quadrada
-        self.sinais = ['R', 'C']
+        self.sinais = {'R': 0, 'C': 1}
         self.caminhos = []
         self.lacos = []
 
@@ -26,8 +26,14 @@ class Sistema:
 
         # adicionar os vértices entre 'R' e 'C':
         if len_matriz > len(self.sinais):
-            for i in range(2, len_matriz):
-                self.sinais.insert(-1, ('V' + str(i)))
+            sinais = [('R', 0)]
+
+            for i in range(1, len_matriz-1):
+                sinais.append((('V' + str(i+1)), i))
+
+            sinais.append(('C', len_matriz-1))
+        
+            self.sinais = dict(sinais)
 
     # atualiza a lista de caminhos:
     def atualiza_caminhos(self):
@@ -35,7 +41,8 @@ class Sistema:
 
         caminhos = []
         # Começar a busca do nó 0
-        encontra_caminho(matriz_up, 0, [], caminhos)
+        # encontra_caminho(matriz_up, 0, [], caminhos)
+        caminhos = encontra_caminho(matriz_up, [[0]])
                     
         self.caminhos = caminhos
 
@@ -43,7 +50,8 @@ class Sistema:
     def atualiza_lacos(self):
         lacos = []
         # Começar a busca do nó 0
-        encontra_laco(self.matriz, 0, [], lacos)
+        # encontra_laco(self.matriz, 0, [], lacos)
+        lacos = encontra_laco(self.matriz, [[0]])
                     
         self.lacos = lacos
 
@@ -71,16 +79,35 @@ class Sistema:
 
     # informações gerais do sistema:
     def status(self):
-        print(f'''INFORMAÇÕES DO SISTEMA
-              
-Sinais: {self.listar_sinais()}
-Caminhos: {self.caminhos}
-Laços: {self.lacos}
 
-Matriz:
+        nomes_sinais = list(self.sinais.keys())
+        
+        # descreve os caminhos e laços pelos nomes dos vértices:
+        nomes_caminhos = []
+        for caminho in self.caminhos:
+            nome = []
+            for valor in caminho:
+                nome.append(nomes_sinais[valor])
 
-{pretty(self.matriz)}
-        ''')
+            nomes_caminhos.append(nome)
+
+        nomes_lacos = []
+        for laco in self.lacos:
+            nome = []
+            for valor in laco:
+                nome.append(nomes_sinais[valor])
+
+            nomes_lacos.append(nome)
+
+        print(f'INFORMAÇÕES DO SISTEMA\n\n')
+        print(f'Sinais: {list(self.listar_sinais().keys())}')
+        # print(f'Caminhos: {self.caminhos}')
+        print(f'Caminhos: {nomes_caminhos}')
+        # print(f'Laços: {self.lacos}')
+        print(f'Laços: {nomes_lacos}')
+
+        print(f'\nMatriz:\n')
+        print(f'{pretty(self.matriz)}')
 
     # cria uma nova conexão entre sinais:
     def adiciona_conexao(self, conexoes):
@@ -179,6 +206,8 @@ Matriz:
     '''
 
 
+# método recursivo:
+'''
 def encontra_caminho(matriz, inicio, caminho, caminhos):
     
     # armazenamos o vértice atual:
@@ -196,7 +225,6 @@ def encontra_caminho(matriz, inicio, caminho, caminhos):
                     
     # remover o vértice atual para permitir outras combinações
     caminho.pop()
-
 
 def encontra_laco(matriz, inicio, laco, lacos):
 
@@ -229,3 +257,93 @@ def encontra_laco(matriz, inicio, laco, lacos):
                     
     # Remover o nó atual para permitir outras combinações
     laco.pop()
+'''
+# métodos não recursivo:
+def encontra_caminho(mat, lista_init):
+    # copia a lista de entrada:
+    lista_caminhos = lista_init.copy()
+    
+    # verifica cada combinação de caminho,
+    while True:
+        candidato = []
+
+        # retira a primeira combinação incompleta disponível da lista, se houver:
+        for index, caminho in enumerate(lista_caminhos):
+            if (mat.rows-1) not in caminho:
+                candidato = lista_caminhos.pop(index)
+                break
+            
+
+        # se não houve nenhum candidato, a expansão acabou:
+        if len(candidato) == 0:
+            break
+        
+        # usa o último vértice para procurar novos caminhos:
+        ult_vertice = candidato[-1]
+
+        novos_caminhos = []
+        for i in range(ult_vertice, mat.cols):
+
+            if mat[ult_vertice, i] != 0:
+                # adiciona o nova combinação a lista de novas caminhos:
+                novos_caminhos.append(candidato + [i])
+
+        # adiciona a nova combinação à lista de combinações
+        lista_caminhos += novos_caminhos
+        
+    return lista_caminhos
+
+def encontra_laco(mat, lista_init):
+    # copia a lista de entrada:
+    lista_lacos = lista_init.copy()
+    
+    # verifica cada combinação de laco,
+    while True:
+        candidato = []
+
+        # retira a primeira combinação incompleta disponível da lista, se houver:
+        for index, comb in enumerate(lista_lacos):
+            # verifica se é laço:
+            if (len(comb) == 1) or (comb[0] != comb[-1]):
+                candidato = lista_lacos.pop(index)
+                break
+        
+        # se não houve nenhum candidato, a expansão acabou:
+        if len(candidato) == 0:
+            break
+        
+        # usa o último vértice para procurar novas combinações:
+        ult_vertice = candidato[-1]
+
+        novas_comb = []
+        for i in range(mat.cols):
+
+            if mat[ult_vertice, i] != 0:
+                
+                novo_laco = candidato + [i]
+
+                # verifica se é um laço:
+                for index, valor in enumerate(novo_laco):
+
+                    # se achar um laço, remove os valores em excesso:
+                    # Ex.: [0, 1, 2, 3, 4, 2] ==> [2, 3, 4, 2]
+                    if novo_laco.count(valor) > 1:
+                        novo_laco = novo_laco[index:]
+                        break
+                    
+                # verifica se já não existe o laço:
+                repetido = False
+                for laco in lista_lacos:
+                    if set(novo_laco) == set(laco):
+                        repetido = True
+
+                # adiciona o nova combinação a lista de novas lacos:
+                if not repetido:
+                    novas_comb.append(novo_laco)
+
+        # adiciona a nova combinação à lista de combinações
+        lista_lacos += novas_comb
+        print(lista_lacos)
+
+    
+    return lista_lacos
