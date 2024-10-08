@@ -72,6 +72,8 @@ sistema.adiciona_conexao(conex)
 
 sistema.setup()
 
+sistema.add_polinomio(conex)
+
 opc = 0
 while True:
     opc = exibe_menu()
