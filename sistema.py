@@ -139,10 +139,10 @@ class Sistema:
         print(f'Caminhos: {self.lista_caminhos()}')
         print(f'Laços: {self.lista_lacos(self.lacos)}')
 
-        print(f'\nMatriz:\n')
-        print(f'{pretty(self.matriz)}')
-
+        print(f'\nMatriz:')
         print(f'\n{pretty(self.matriz)}')
+
+        print(f'\n{pretty(self.matriz_poly)}')
         for i in self.lacos_nao_se_tocam(self.lacos):
             print(self.lista_lacos(i)) 
 
@@ -150,7 +150,7 @@ class Sistema:
     def adiciona_conexao(self, conexoes):
 
         # remove os espaços em branco:
-        lista_sem_espacos = conexoes.strip().replace(' ', '')
+        lista_sem_espacos = conexoes.replace(' ', '')
         # print(lista_sem_espacos); time.sleep(3)
         
         # testa se a entrada é válida:
@@ -177,24 +177,42 @@ class Sistema:
                 # return
                 continue
             
-            self.matriz[sinal1-1, sinal2-1] += 1
+            self.matriz[sinal1, sinal2] += 1
 
     def add_polinomio(self, conexoes):
-        lista_sem_espacos = conexoes.strip().replace(' ', '')
-            
+        
+        # remove os espaços em branco:
+        lista_sem_espacos = conexoes.replace(' ', '')
+        
+        # testa se a entrada é válida:
+        for caractere in lista_sem_espacos:
+            # só permite passar números positivos e o caracter '>':
+            if not (caractere.isdigit() or caractere in '>,RVGHC'):
+                print('Entrada Inválida!'); time.sleep(0.2)
+                return None
+
+        # separa as conexões:
         lista_conexoes = lista_sem_espacos.split(',')
+
+        # adiciona cada um na sua posição:
         for conexao in lista_conexoes:
             eq = 1
-            sinal1, sinal2 = [int(num) for num in conexao.split('>')]
+            
+            sinal1_k, sinal2_k = [valor for valor in conexao.split('>')]
+
+            sinal1, sinal2 = self.sinais[sinal1_k], self.sinais[sinal2_k]
+            # print(sinal1_k, sinal1,sinal2_k, sinal2); time.sleep(3)
+            
             # x = input(f'Polinomio da conexão: {conexao}')
-            eq = input(f'Polinômio da conexão {sinal1}>{sinal2}:')
+            
             os.system('cls')
-            if ((sinal1-1) > self.matriz_poly.rows-1 or (sinal2-1) > self.matriz_poly.rows-1) or sinal1 == sinal2:
+            eq = input(f'Polinômio da conexão {sinal1_k}>{sinal2_k}:')
+            if ((sinal1) > self.matriz_poly.rows-1 or (sinal2) > self.matriz_poly.rows-1) or sinal1 == sinal2:
                 # print('Entrada Inválida!'); time.sleep(0.2)
                 # return
                 continue
             
-            self.matriz_poly[sinal1-1, sinal2-1] = eq
+            self.matriz_poly[sinal1, sinal2] = eq
 
     # ==================================================
     # METODOS EM TESTE...
@@ -403,7 +421,6 @@ def encontra_laco(mat, lista_init):
 
         # adiciona a nova combinação à lista de combinações
         lista_lacos += novas_comb
-        print(lista_lacos)
 
     return lista_lacos
 
