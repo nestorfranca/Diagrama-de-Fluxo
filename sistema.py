@@ -1,6 +1,8 @@
 from sympy import symbols, Matrix, pretty
 import time, os
 
+from itertools import combinations, chain
+
 # Definindo variáveis simbólicas:
 s = symbols('s')
 
@@ -63,26 +65,13 @@ class Sistema:
 
     # retorna a lista de sinais:
     def listar_sinais(self):
-        return self.sinais
+        return list(self.sinais.keys())
     
     # retorna a lista todos os ganhos de caminho à frente do sistema:
     def lista_caminhos(self):
-        return self.caminhos
-
-    # retorna a lista todos os ganhos de laço do sistema:
-    def lista_lacos(self):
-        return self.lacos
-
-    # calcula a FT resultante do sistema e exibe resultado:
-    def calcula_FT(self):
-        pass
-
-    # informações gerais do sistema:
-    def status(self):
-
-        nomes_sinais = list(self.sinais.keys())
+        nomes_sinais = self.listar_sinais()
         
-        # descreve os caminhos e laços pelos nomes dos vértices:
+        # descreve os caminhos pelos nomes dos vértices:
         nomes_caminhos = []
         for caminho in self.caminhos:
             nome = []
@@ -91,23 +80,68 @@ class Sistema:
 
             nomes_caminhos.append(nome)
 
+        return nomes_caminhos
+
+    # retorna a lista todos os ganhos de laço do sistema:
+    def lista_lacos(self, lacos):
+        nomes_sinais = self.listar_sinais()
+
+        # descreve os laços pelos nomes dos vértices:
         nomes_lacos = []
-        for laco in self.lacos:
+        for laco in lacos:
             nome = []
             for valor in laco:
                 nome.append(nomes_sinais[valor])
 
             nomes_lacos.append(nome)
+        
+        return nomes_lacos
+
+    # ==================================================
+    # FUNÇÕES AUXILIARES PARA CALCULAR A FT EQUIVALENTE:
+
+    def lacos_nao_se_tocam(self, vetor_lacos):
+        comb = list(chain.from_iterable(
+            combinations(vetor_lacos, r) for r in range(1, len(vetor_lacos) + 1)
+        ))
+
+        comb = list(filter(lambda x: len(x) > 1, comb))
+
+        nao_tocam = []
+
+        for i in comb:
+            colisao = False
+            for laco1 in i:
+                for laco2 in i:
+                    if laco1 == laco2:
+                        continue
+
+                    valor_comum = set(laco1).intersection(set(laco2))
+                    if len(valor_comum) > 0:
+                        colisao = True
+                    
+            if not colisao:
+                nao_tocam.append(i)
+
+        return nao_tocam
+    
+    # ==================================================
+    # calcula a FT resultante do sistema e exibe resultado:
+    def calcula_FT(self):
+        pass
+
+    # informações gerais do sistema:
+    def status(self):
 
         print(f'INFORMAÇÕES DO SISTEMA\n\n')
-        print(f'Sinais: {list(self.listar_sinais().keys())}')
-        # print(f'Caminhos: {self.caminhos}')
-        print(f'Caminhos: {nomes_caminhos}')
-        # print(f'Laços: {self.lacos}')
-        print(f'Laços: {nomes_lacos}')
+        print(f'Sinais: {self.listar_sinais()}')
+        print(f'Caminhos: {self.lista_caminhos()}')
+        print(f'Laços: {self.lista_lacos(self.lacos)}')
 
         print(f'\nMatriz:\n')
-        print(f'{pretty(self.matriz)}')
+        print(f'\n{pretty(self.matriz)}')
+        for i in self.lacos_nao_se_tocam(self.lacos):
+            print(self.lista_lacos(i)) 
 
     # cria uma nova conexão entre sinais:
     def adiciona_conexao(self, conexoes):
@@ -119,7 +153,7 @@ class Sistema:
         # testa se a entrada é válida:
         for caractere in lista_sem_espacos:
             # só permite passar números positivos e o caracter '>':
-            if not (caractere.isdigit() or caractere in ['>', ',', 'R', 'V', 'G', 'C']):
+            if not (caractere.isdigit() or caractere in '>,RVGHC'):
                 print('Entrada Inválida!'); time.sleep(0.2)
                 return None
         
