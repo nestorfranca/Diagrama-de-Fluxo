@@ -13,6 +13,7 @@ s = symbols('s')
 class Sistema:
     def __init__(self, num_sinais):
         self.matriz = Matrix.zeros(num_sinais, num_sinais) # matriz quadrada
+        self.matriz_poly = Matrix.zeros(num_sinais, num_sinais) # matriz quadrada
         self.sinais = {'R': 0, 'C': 1}
         self.caminhos = []
         self.lacos = []
@@ -139,6 +140,8 @@ class Sistema:
         print(f'Laços: {self.lista_lacos(self.lacos)}')
 
         print(f'\nMatriz:\n')
+        print(f'{pretty(self.matriz)}')
+
         print(f'\n{pretty(self.matriz)}')
         for i in self.lacos_nao_se_tocam(self.lacos):
             print(self.lista_lacos(i)) 
@@ -174,7 +177,25 @@ class Sistema:
                 # return
                 continue
             
-            self.matriz[sinal1, sinal2] += 1
+            self.matriz[sinal1-1, sinal2-1] += 1
+
+    def add_polinomio(self, conexoes):
+        lista_sem_espacos = conexoes.strip().replace(' ', '')
+            
+        lista_conexoes = lista_sem_espacos.split(',')
+        for conexao in lista_conexoes:
+            eq = 1
+            sinal1, sinal2 = [int(num) for num in conexao.split('>')]
+            # x = input(f'Polinomio da conexão: {conexao}')
+            eq = input(f'Polinômio da conexão {sinal1}>{sinal2}:')
+            os.system('cls')
+            if ((sinal1-1) > self.matriz_poly.rows-1 or (sinal2-1) > self.matriz_poly.rows-1) or sinal1 == sinal2:
+                # print('Entrada Inválida!'); time.sleep(0.2)
+                # return
+                continue
+            
+            self.matriz_poly[sinal1-1, sinal2-1] = eq
+
     # ==================================================
     # METODOS EM TESTE...
     '''
@@ -385,3 +406,5 @@ def encontra_laco(mat, lista_init):
         print(lista_lacos)
 
     return lista_lacos
+
+
