@@ -41,8 +41,8 @@ class Sistema:
         matriz_up = self.matriz.upper_triangular()
 
         caminhos = []
+
         # Começar a busca do nó 0
-        # encontra_caminho(matriz_up, 0, [], caminhos)
         caminhos = encontra_caminho(matriz_up, [[0]])
                     
         self.caminhos = caminhos
@@ -50,8 +50,8 @@ class Sistema:
     # atualiza a lista de lacos:
     def atualiza_lacos(self):
         lacos = []
+
         # Começar a busca do nó 0
-        # encontra_laco(self.matriz, 0, [], lacos)
         lacos = encontra_laco(self.matriz, [[0]])
                     
         self.lacos = lacos
@@ -115,11 +115,12 @@ class Sistema:
 
         # remove os espaços em branco:
         lista_sem_espacos = conexoes.strip().replace(' ', '')
+        # print(lista_sem_espacos); time.sleep(3)
         
         # testa se a entrada é válida:
         for caractere in lista_sem_espacos:
             # só permite passar números positivos e o caracter '>':
-            if not (caractere.isdigit() or caractere == '>' or caractere == ','):
+            if not (caractere.isdigit() or caractere in ['>', ',', 'R', 'V', 'G', 'C']):
                 print('Entrada Inválida!'); time.sleep(0.2)
                 return None
         
@@ -130,8 +131,12 @@ class Sistema:
 
         # adiciona cada um na sua posição:
         for conexao in lista_conexoes:
-            sinal1, sinal2 = [int(num) for num in conexao.split('>')]
-            if ((sinal1-1) > self.matriz.rows-1 or (sinal2-1) > self.matriz.rows-1) or sinal1 == sinal2:
+            sinal1_k, sinal2_k = [valor for valor in conexao.split('>')]
+            
+            sinal1, sinal2 = self.sinais[sinal1_k], self.sinais[sinal2_k]
+            # print(sinal1_k, sinal1,sinal2_k, sinal2); time.sleep(3)
+
+            if ((sinal1) > self.matriz.rows-1 or (sinal2) > self.matriz.rows-1) or sinal1 == sinal2:
                 # print('Entrada Inválida!'); time.sleep(0.2)
                 # return
                 continue
@@ -364,7 +369,6 @@ def encontra_laco(mat, lista_init):
         lista_lacos += novas_comb
         print(lista_lacos)
 
-    
     return lista_lacos
 
 
