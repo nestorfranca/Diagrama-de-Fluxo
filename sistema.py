@@ -32,7 +32,7 @@ class Sistema:
             sinais = [('R', 0)]
 
             for i in range(1, len_matriz-1):
-                sinais.append((('V' + str(i+1)), i))
+                sinais.append((('V' + str(i)), i))
 
             sinais.append(('C', len_matriz-1))
         
@@ -207,6 +207,8 @@ class Sistema:
             
             os.system('cls')
             eq = input(f'Polinômio da conexão {sinal1_k}>{sinal2_k}:')
+            if eq == '':
+                eq = 1
             if ((sinal1) > self.matriz_poly.rows-1 or (sinal2) > self.matriz_poly.rows-1) or sinal1 == sinal2:
                 # print('Entrada Inválida!'); time.sleep(0.2)
                 # return
