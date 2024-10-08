@@ -40,8 +40,8 @@ class Sistema:
         matriz_up = self.matriz.upper_triangular()
 
         caminhos = []
+
         # Começar a busca do nó 0
-        # encontra_caminho(matriz_up, 0, [], caminhos)
         caminhos = encontra_caminho(matriz_up, [[0]])
                     
         self.caminhos = caminhos
@@ -49,8 +49,8 @@ class Sistema:
     # atualiza a lista de lacos:
     def atualiza_lacos(self):
         lacos = []
+
         # Começar a busca do nó 0
-        # encontra_laco(self.matriz, 0, [], lacos)
         lacos = encontra_laco(self.matriz, [[0]])
                     
         self.lacos = lacos
@@ -113,7 +113,7 @@ class Sistema:
     def adiciona_conexao(self, conexoes):
 
         # remove os espaços em branco:
-        lista_sem_espacos = conexoes.strip().replace(' ', '')
+        lista_sem_espacos = conexoes.replace(' ', '')
         
         # testa se a entrada é válida:
         for caractere in lista_sem_espacos:
@@ -282,6 +282,8 @@ def encontra_caminho(mat, lista_init):
         ult_vertice = candidato[-1]
 
         novos_caminhos = []
+
+        novos_caminhos = expande(ult_vertice)
         for i in range(ult_vertice, mat.cols):
 
             if mat[ult_vertice, i] != 0:
@@ -345,5 +347,4 @@ def encontra_laco(mat, lista_init):
         lista_lacos += novas_comb
         print(lista_lacos)
 
-    
     return lista_lacos
