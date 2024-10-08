@@ -73,27 +73,47 @@ class Sistema:
 
     # informações gerais do sistema:
     def status(self):
-        print(f'''INFORMAÇÕES DO SISTEMA
-              
-Sinais: {self.listar_sinais()}
-Caminhos: {self.caminhos}
-Laços: {self.lacos}
+        
+        nomes_sinais = list(self.sinais.keys())
+        
+        # descreve os caminhos e laços pelos nomes dos vértices:
+        nomes_caminhos = []
+        for caminho in self.caminhos:
+            nome = []
+            for valor in caminho:
+                nome.append(nomes_sinais[valor])
 
-Matriz:
+            nomes_caminhos.append(nome)
 
-{pretty(self.matriz)}
-        ''')
+        nomes_lacos = []
+        for laco in self.lacos:
+            nome = []
+            for valor in laco:
+                nome.append(nomes_sinais[valor])
+
+            nomes_lacos.append(nome)
+
+        print(f'INFORMAÇÕES DO SISTEMA\n\n')
+        print(f'Sinais: {list(self.listar_sinais().keys())}')
+        # print(f'Caminhos: {self.caminhos}')
+        print(f'Caminhos: {nomes_caminhos}')
+        # print(f'Laços: {self.lacos}')
+        print(f'Laços: {nomes_lacos}')
+
+        print(f'\nMatriz:\n')
+        print(f'{pretty(self.matriz)}')
 
     # cria uma nova conexão entre sinais:
     def adiciona_conexao(self, conexoes):
 
         # remove os espaços em branco:
         lista_sem_espacos = conexoes.strip().replace(' ', '')
+        # print(lista_sem_espacos); time.sleep(3)
         
         # testa se a entrada é válida:
         for caractere in lista_sem_espacos:
             # só permite passar números positivos e o caracter '>':
-            if not (caractere.isdigit() or caractere == '>' or caractere == ','):
+            if not (caractere.isdigit() or caractere in ['>', ',', 'R', 'V', 'G', 'C']):
                 print('Entrada Inválida!'); time.sleep(0.2)
                 return None
         
@@ -104,13 +124,17 @@ Matriz:
 
         # adiciona cada um na sua posição:
         for conexao in lista_conexoes:
-            sinal1, sinal2 = [int(num) for num in conexao.split('>')]
-            if ((sinal1-1) > self.matriz.rows-1 or (sinal2-1) > self.matriz.rows-1) or sinal1 == sinal2:
+            sinal1_k, sinal2_k = [valor for valor in conexao.split('>')]
+            
+            sinal1, sinal2 = self.sinais[sinal1_k], self.sinais[sinal2_k]
+            # print(sinal1_k, sinal1,sinal2_k, sinal2); time.sleep(3)
+
+            if ((sinal1) > self.matriz.rows-1 or (sinal2) > self.matriz.rows-1) or sinal1 == sinal2:
                 # print('Entrada Inválida!'); time.sleep(0.2)
                 # return
                 continue
             
-            self.matriz[sinal1-1, sinal2-1] += 1
+            self.matriz[sinal1, sinal2] += 1
     # ==================================================
     # METODOS EM TESTE...
     '''
@@ -204,7 +228,6 @@ def encontra_caminho(mat, lista_init):
 
         novos_caminhos = []
 
-        novos_caminhos = expande(ult_vertice)
         for i in range(ult_vertice, mat.cols):
 
             if mat[ult_vertice, i] != 0:
