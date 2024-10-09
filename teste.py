@@ -1,4 +1,4 @@
-from sympy import Matrix
+from sympy import Matrix, pretty
 from time import sleep
 
 # Exemplo de matriz de adjacência com ganhos
@@ -7,6 +7,7 @@ matriz = Matrix([ [0, 1, 0, 1],
                   [0, 0, 0, 1],
                   [1, 0, 0, 0]])
 
+print(pretty(matriz))
 def encontrar_lacos(matriz):
     lacos = []
 
