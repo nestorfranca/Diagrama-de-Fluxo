@@ -17,6 +17,11 @@ class Sistema:
         self.sinais = {'R': 0, 'C': 1}
         self.caminhos = []
         self.lacos = []
+        self.ganho_caminho = []
+        self.ganho_lacos = []
+        self.nao_tocam = []
+        self.ganhos_nao_tocam = []
+        self.delta = 1
 
         # definindo caminho unitário entre entrada e saída:
         # self.matriz[0, 1] = 1
@@ -68,6 +73,20 @@ class Sistema:
     def listar_sinais(self):
         return list(self.sinais.keys())
     
+    def multiplica(self, conex):
+        ganho = []
+        for i in conex:
+            ganho_ = 1
+            for j in range(len(i)-1):
+                prox = (j+1)%len(i)
+
+                sinal1 = i[j]
+                sinal2 = i[prox]
+
+                ganho_ *= self.matriz_poly[sinal1, sinal2]
+            ganho.append(ganho)
+        return ganho
+
     # retorna a lista todos os ganhos de caminho à frente do sistema:
     def lista_caminhos(self):
         nomes_sinais = self.listar_sinais()
@@ -124,8 +143,49 @@ class Sistema:
             if not colisao:
                 nao_tocam.append(i)
 
-        return nao_tocam
+        self.nao_tocam = nao_tocam
+        # return nao_tocam
     
+    def ganho_caminho_frente(self):
+        self.ganho_caminhos = self.multiplica(self.caminhos)
+
+    def ganhos_lacos(self):
+        self.ganho_lacos = self.multiplica(self.lacos)
+ 
+    def ganho_nao_tocam(self):
+        
+        ganhos_nao_tocam = []
+        for i in self.nao_tocam:
+            grau = len(i)
+            ganho = 1
+            for j in i:
+                id = self.lacos.index(j)
+                ganho *= self.ganho_lacos[id]
+
+            ganhos_nao_tocam.append(tuple([ganho, grau]))
+            
+        self.ganhos_nao_tocam = ganhos_nao_tocam
+
+
+    def _delta(self):
+        delta_ = 0
+        
+        for i in self.ganho_lacos:
+            delta_ += i
+
+        for i in range(self.ganhos_nao_tocam):
+            if i[1]%2 == 0:
+                delta_ += i
+            else: 
+                delta_ -=i
+
+        self.delta = 1 + delta_
+
+
+    def delta_k(self):
+        pass
+        
+
     # ==================================================
     # calcula a FT resultante do sistema e exibe resultado:
     def calcula_FT(self):
@@ -135,16 +195,20 @@ class Sistema:
     def status(self):
 
         print(f'INFORMAÇÕES DO SISTEMA\n\n')
-        print(f'Sinais: {self.listar_sinais()}')
-        print(f'Caminhos: {self.lista_caminhos()}')
+        print(f'Sinais: {self.sinais}')
+        # print(f'Sinais: {self.listar_sinais()}')
+        # print(f'Caminhos: {self.lista_caminhos()}')
+        print(f'Caminhos: {self.caminhos}')
         print(f'Laços: {self.lista_lacos(self.lacos)}')
+        print(self.ganho_lacos)
 
         print(f'\nMatriz:')
         print(f'\n{pretty(self.matriz)}')
 
         print(f'\n{pretty(self.matriz_poly)}')
-        for i in self.lacos_nao_se_tocam(self.lacos):
-            print(self.lista_lacos(i)) 
+        print(self.nao_tocam) 
+
+        print(f'{self.ganhos_nao_tocam}')
 
     # cria uma nova conexão entre sinais:
     def adiciona_conexao(self, conexoes):
@@ -215,6 +279,7 @@ class Sistema:
                 continue
             
             self.matriz_poly[sinal1, sinal2] = eq
+
 
     # ==================================================
     # METODOS EM TESTE...

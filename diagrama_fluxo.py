@@ -73,6 +73,9 @@ sistema.adiciona_conexao(conex)
 sistema.setup()
 
 sistema.add_polinomio(conex)
+sistema.ganhos_lacos()
+sistema.lacos_nao_se_tocam(sistema.lacos)
+sistema.ganho_nao_tocam()
 
 opc = 0
 while True:

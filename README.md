@@ -2,6 +2,9 @@
 
 <img alt="Diagrama de Fluxo de Sinal" src="img/diagrama_fluxo.png">
 
+## Sianis 
+#### 10 sinais
+
 ## Input
 #### R>V1, V1>V2, V2>V3, V3>V4, V4>V5, V5>C, V3>V5, V4>V7, V7>V3, V4>V6, V6>V1, C>V8, V8>V5
 
