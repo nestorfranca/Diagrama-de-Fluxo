@@ -98,7 +98,8 @@ while True:
         g = sistema.exibe_lista(sistema.lista_caminhos(), '->', True)
         for ganho in sistema.ganho_caminhos:
             next(g)
-            print(f'Ganho: {ganho}\n')
+            print(f'Ganho:')
+            print(f'{pretty(ganho)}\n')
 
         print(f'\nMATRIZ DE GANHOS:')
         sistema.exibe_matriz(sistema.matriz_poly)
@@ -113,14 +114,16 @@ while True:
         g1 = sistema.exibe_lista(sistema.lista_lacos(), '->', True)
         for ganho in sistema.ganho_lacos:
             next(g1)
-            print(f'Ganho: {ganho}\n')
+            print(f'Ganho:')
+            print(f'{pretty(ganho)}\n')
         
         # imprime o grupo de laços que não se tocam:
         print(f'\nLaços que não se tocam:')
         g2 = sistema.exibe_lista(sistema.lista_lacos_nao_tocam(), 'e', True)
         for ganho in sistema.ganhos_nao_tocam:
             next(g2)
-            print(f'Ganho: {ganho[0]}\n')
+            print(f'Ganho:')
+            print(f'{pretty(ganho[0])}\n')
 
         print(f'\nMATRIZ DE GANHOS:')
         sistema.exibe_matriz(sistema.matriz_poly)
