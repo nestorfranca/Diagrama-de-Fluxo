@@ -322,7 +322,7 @@ class Sistema:
             
         self.ganhos_nao_tocam = ganhos_nao_tocam
 
-    #
+    # calcula o valor de delta geral:
     def __delta(self):
 
         # soma os ganhos:
@@ -378,7 +378,7 @@ class Sistema:
 
     # MÉTODOS AUXILIARES:
     
-    #
+    # exibe os valores da lista inserida, separados por um marcador
     def exibe_lista(self, lista, marcador, trava = False):
         for id1, item in enumerate(lista):
             print(f'{id1+1}. ', end='')
