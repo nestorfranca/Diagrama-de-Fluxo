@@ -1,4 +1,4 @@
-from sympy import symbols, Matrix, pretty, sympify
+from sympy import symbols, Matrix, pretty, sympify, simplify
 import time, os
 
 from itertools import combinations, chain
@@ -79,7 +79,20 @@ class Sistema:
 
     # calcula a FT resultante do sistema e exibe resultado:
     def calcula_FT(self):
-        pass
+        # calcula delta:
+        self.__delta()
+
+        # valores de delta de cada caminho:        
+        deltas_k = self.__delta_k()
+
+        # calcula FT equivalente:
+        sum = 0
+        for k in range(len(self.caminhos)):
+            sum += (self.ganho_caminhos[k]* deltas_k[k])
+        
+        FT = sum/self.delta
+        
+        print(pretty(simplify(FT)))
     
     # informações gerais do sistema:
     def status(self):
@@ -172,6 +185,8 @@ class Sistema:
             sinal1_k, sinal2_k = conexao[0], conexao[1]
             sinal1, sinal2 = self.sinais[sinal1_k], self.sinais[sinal2_k]
             
+            os.system('cls')
+
             eq = input(f'Polinômio da conexão {sinal1_k}>{sinal2_k}:')
             if eq == '':
                 eq = 1
@@ -309,24 +324,57 @@ class Sistema:
 
     #
     def __delta(self):
-        delta_ = 0
-        
+
+        # soma os ganhos:
+        soma_ganho = 0        
         for i in self.ganho_lacos:
-            delta_ += i
+            soma_ganho -= i
 
-        for i in range(self.ganhos_nao_tocam):
+        # print(f'ganho: {soma_ganho}'); time.sleep(3)
+
+        # soma dos ganhos que não se tocam:
+        soma_ganho_nao_tocam = 0
+        for i in self.ganhos_nao_tocam:
             if i[1]%2 == 0:
-                delta_ += i
+                soma_ganho_nao_tocam += i[0]
             else: 
-                delta_ -=i
+                soma_ganho_nao_tocam -= i[0]
 
-        self.delta = 1 + delta_
+        # print(f'nao_tocam: {soma_ganho_nao_tocam}'); time.sleep(3)
 
-    #
+        self.delta = 1 + soma_ganho + soma_ganho_nao_tocam
+
+    # calcula o valor de delta para cada caminho:
     def __delta_k(self):
-        pass
-        
+        deltas_k = []
 
+        # identifica quem o caminho encosta:
+        for T in self.caminhos:
+            delta_k = self.delta
+            
+            # elimina os ganhos de laço:
+            for id, laco in enumerate(self.lacos):
+                if set(T).intersection(set(laco)):
+                    delta_k += self.ganho_lacos[id]
+            
+            # elimina os ganhos de laço que não se tocam:
+            for id, nao_tocam in enumerate(self.nao_tocam):
+                for laco in nao_tocam:
+
+                    # basta um laço do grupo 'nao_tocam' encostar no caminho
+                    if set(T).intersection(set(laco)):
+                        ganho = self.ganhos_nao_tocam[id]
+                        
+                        if ganho[1]%2 == 0:
+                            delta_k -= ganho[0]
+                        else: 
+                            delta_k += ganho[0]
+                        break
+            
+            # salva o valor de delta do caminho:
+            deltas_k.append(delta_k)
+        
+        return deltas_k
 
     # MÉTODOS AUXILIARES:
     

@@ -133,6 +133,7 @@ while True:
         print('Calculando Função de Transferência...'); time.sleep(0.2)
         os.system('cls')
 
+        print(f'FUNÇÃO TRANSFERÊNCIA EQUIVALENTE:\n')
         sistema.calcula_FT()
         input()
 
