@@ -15,8 +15,6 @@ class Sistema:
         self.inputs = []
         self.matriz = [[0 for _ in range(num_sinais)] for _ in range(num_sinais)] # matriz quadrada
         self.matriz_poly = [[0 for _ in range(num_sinais)] for _ in range(num_sinais)]
-        # self.matriz = Matrix.zeros(num_sinais, num_sinais) # matriz quadrada
-        # self.matriz_poly = Matrix.zeros(num_sinais, num_sinais) # matriz quadrada
         
         self.sinais = {'R': 0, 'C': 1}
         self.caminhos = []
@@ -27,8 +25,7 @@ class Sistema:
         self.ganhos_nao_tocam = []
         self.delta = 1
 
-        # definindo caminho unitário entre entrada e saída:
-        # self.matriz[0, 1] = 1
+        # definindo
         self.__setup()
     
     # ==================================================
@@ -130,7 +127,6 @@ class Sistema:
         
         # testa se a entrada é válida:
         for caractere in lista_sem_espacos:
-            # só permite passar números positivos e os caracteres aprovados:
             if not (caractere.isdigit() or caractere in '>,RVGHC'):
                 print('Entrada Inválida!'); time.sleep(0.2)
                 return None
@@ -143,11 +139,11 @@ class Sistema:
         # adiciona cada um na sua posição:
         for conexao in lista_conexoes:
 
-            # identifica o valor referente a chave escrita:
+            # identifica o sinal referente a chave inserida:
             sinal1_k, sinal2_k = [valor for valor in conexao.split('>')]
             sinal1, sinal2 = self.sinais[sinal1_k], self.sinais[sinal2_k]
 
-            # se a conexão for válida, então adiciona na matriz de adjacências:
+            # verifica se a conexão é válida, então adiciona na matriz de adjacências:
             if ((sinal1) > len(self.matriz)-1 or (sinal2) > len(self.matriz)-1) or sinal1 == sinal2:
                 # print('Entrada Inválida!'); time.sleep(0.2)
                 # return
@@ -168,26 +164,18 @@ class Sistema:
 
     # preenche a tabela de ganhos, de acordo com as conexões:
     def add_polinomio(self):
-        
         inputs_adicionados = []
+        
         # adiciona cada um na sua posição:
         for conexao in self.inputs:            
-            eq = 1
-            
-            sinal1_k, sinal2_k = conexao[0], conexao[1]
 
+            sinal1_k, sinal2_k = conexao[0], conexao[1]
             sinal1, sinal2 = self.sinais[sinal1_k], self.sinais[sinal2_k]
-            # print(sinal1_k, sinal1,sinal2_k, sinal2); time.sleep(3)
             
-            # x = input(f'Polinomio da conexão: {conexao}')
-            
-            os.system('cls')
             eq = input(f'Polinômio da conexão {sinal1_k}>{sinal2_k}:')
             if eq == '':
                 eq = 1
             if ((sinal1) > len(self.matriz_poly)-1 or (sinal2) > len(self.matriz_poly)-1) or sinal1 == sinal2:
-                # print('Entrada Inválida!'); time.sleep(0.2)
-                # return
                 continue
             
 

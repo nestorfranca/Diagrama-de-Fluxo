@@ -62,11 +62,14 @@ os.system('cls')
 sistema = Sistema(num_sinais)
 print('Para adicionar novas conexões, utilize a simbologia a seguir:')
 print('''
-    1>2: indica um caminho do sinal 1 para o sinal 2;
-    2>1: indica um laço de realimentação do sinal 2 para o sinal 1.
+    R>V1: indica um caminho do sinal da entrada R para o sinal V1;
+    V3>V1: indica um laço de realimentação do sinal V3 para o sinal de entrada V1.
 
 ''')
 
+# R>V1, V1>V2,  V1>V2,  V1>V4,  V2>V3,  V3>V2,  V3>V4,  V4>V5,  V5>V4,  V5>V4,  V5>V1,  V5>C
+# 1,    s,      2*s,    2*s,    s,      -1,     1,     1/(s+1), -1,     -4,     -1,     1  
+# R>V1, V1>V2, V2>V3, V2>V4, V3>V4, V3>V2, V3>V1, V4>C, C>V4
 conex = input('Insira as conexões a serem adicionadas, separadas por vírgula:\n')
 sistema.adiciona_conexao(conex)
 
