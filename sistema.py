@@ -82,6 +82,10 @@ class Sistema:
         # calcula delta:
         self.__delta()
 
+        if self.delta == 0:
+            print("INDETERMINADO! Delta igual a Zero.")
+            return
+        
         # valores de delta de cada caminho:        
         deltas_k = self.__delta_k()
 
