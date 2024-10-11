@@ -80,14 +80,14 @@ class Sistema:
     # calcula a FT resultante do sistema e exibe resultado:
     def calcula_FT(self):
         # calcula delta:
-        self.__delta()
+        self.calcula_delta()
 
         if self.delta == 0:
             print("INDETERMINADO! Delta igual a Zero.")
             return
         
         # valores de delta de cada caminho:        
-        deltas_k = self.__delta_k()
+        deltas_k = self.calcula_delta_k()
 
         # calcula FT equivalente:
         sum = 0
@@ -96,8 +96,8 @@ class Sistema:
         
         FT = sum/self.delta
         
-        print(pretty(simplify(FT)))
-    
+        return FT
+
     # informações gerais do sistema:
     def status(self):
 
@@ -327,7 +327,7 @@ class Sistema:
         self.ganhos_nao_tocam = ganhos_nao_tocam
 
     # calcula o valor de delta geral:
-    def __delta(self):
+    def calcula_delta(self):
 
         # soma os ganhos:
         soma_ganho = 0        
@@ -346,10 +346,11 @@ class Sistema:
 
         # print(f'nao_tocam: {soma_ganho_nao_tocam}'); time.sleep(3)
 
+        # return 1 + soma_ganho + soma_ganho_nao_tocam
         self.delta = 1 + soma_ganho + soma_ganho_nao_tocam
 
     # calcula o valor de delta para cada caminho:
-    def __delta_k(self):
+    def calcula_delta_k(self):
         deltas_k = []
 
         # identifica quem o caminho encosta:
