@@ -275,7 +275,7 @@ class Grafico:
     
     # Plota o caminho em destaque:
     def draw_caminho(self, vetor, valor):
-        self.transparencia[0] = self.transparencia[0] / 5
+        self.transparencia[0] = 0.4
         dep = vetor[valor]
 
         dep_d = dict()
