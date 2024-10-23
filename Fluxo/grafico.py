@@ -40,13 +40,14 @@ class Grafico:
         for i in range(len(self.nos)):
             self.pos[self.nos[i]] = (self.pos_x[i], self.pos_y[i])
 
+    def gera_plot(self):
         # Criar a figura e remove os eixos:
         fig, self.ax = plt.subplots(figsize=(len(self.matriz), len(self.matriz)));
         limites = [abs(min(self.pos_y)), abs(max(self.pos_y))];
         limite = max(limites);
         plt.ylim(-limite*2.5, limite*2.5); # Colocar o menor e maior peso para y
         # ax.set_axis_off()
-
+        
     # Define coordenada X dos nós:
     def define_pos_X(self):
         # Inicializa as posições do eixo X em "-1":
@@ -291,5 +292,3 @@ class Grafico:
         self.draw_connections([], self.transparencia[0])
         
         plt.show()
-
-    
