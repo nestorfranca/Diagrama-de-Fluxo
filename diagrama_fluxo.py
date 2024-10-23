@@ -9,6 +9,7 @@
 from sympy import symbols, Matrix, pretty
 import os, time
 from sistema import *
+from grafico import *
 
 '''
     NOTAS PARA CRIAÇÃO DA MATRIZ:
@@ -47,6 +48,7 @@ def exibe_menu():
 4 - Listar Ganhos de Laço
 5 - Calcular FT
 6 - Encerrar
+7 - Plota Gráfico
     ''');
 
     resp = input('\nEscolha uma opção: ')
@@ -141,6 +143,10 @@ while True:
         print('Encerrando Programa...'); time.sleep(0.2)
         os.system('cls')
         break
+
+    elif opc == 7:
+        grafico = Grafico(sistema)
+        grafico.draw()
 
     else:
         print('Opção Inválida...'); time.sleep(0.2)

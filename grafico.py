@@ -3,6 +3,7 @@ from sistema import *
 
 class Grafico:
     def __init__(self, sistema):
+        self.sistema = sistema
         self.num_sinais = sistema.num_sinais
         self.matriz = sistema.matriz
         self.pos_x = []
@@ -19,7 +20,7 @@ class Grafico:
         self.ax = None
         self.transparencia = [1, 1]
 
-        self._setup()
+        self.setup()
 
     # ==================================================
     # MÉTODOS PRIVADOS:
@@ -27,16 +28,18 @@ class Grafico:
     # Configurações da classe:
     def setup(self):
 
-        self.pos_x, self.pos_y = self.define_pos_X(), self.define_pos_Y()
+        self.principal = max(self.caminhos, key=lambda caminho: len(caminho))
+        self.max_len = len(self.principal)
+        self.conta_caminhos = sum(1 for caminho in self.caminhos if len(caminho) == self.max_len)
+        
+        self.pos_x = self.define_pos_X()
+        self.pos_y = self.define_pos_Y()
 
         self.nos = list(self.sinais.keys())
         # self.pos = dict([self.nos[i], (self.pos_x[i], self.pos_y[i])] for i in range(len(self.nos)))
         for i in range(len(self.nos)):
             self.pos[self.nos[i]] = (self.pos_x[i], self.pos_y[i])
 
-        self.principal = max(self.caminhos_frente, key=lambda caminho: len(caminho))
-        self.max_len = len(self.principal)
-        self.conta_caminhos = sum(1 for caminho in self.caminhos_frente if len(caminho) == self.max_len)
 
         # Criar a figura e remove os eixos
         _, self.ax = plt.subplots(figsize=(len(self.matriz), len(self.matriz)))
@@ -57,7 +60,7 @@ class Grafico:
         # [0, 1, 2, 3, 4, 5, -1, -1, -1, 6]
 
         # Define posição do eixo X das ramificações do caminho de frente principal:
-        for value in self.caminhos_frente:
+        for value in self.caminhos:
             
             if value == self.principal:
                 continue
@@ -125,7 +128,7 @@ class Grafico:
         # [0, 0, 0, 0, 0, -1, -1, -1, 0]
 
         # Define posição do eixo Y das ramificações do caminho de frente principal:
-        for value in self.caminhos_frente:
+        for value in self.caminhos:
             
             if value == self.principal:
                 continue
@@ -169,6 +172,7 @@ class Grafico:
                 if v == dif[0]:
                     inicio = value[i-1]
 
+                # [1, 3, 4, 7, 1]
                 if v == dif[-1]:
                     fim = value[i+1]
             
