@@ -217,12 +217,12 @@ class Grafico:
                         if abs(start[0] - end[0]) > 1 or ((i in self.principal) ^ (j in self.principal)) or ((start[0] - end[0]) > 0):
                             curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
                         # Definindo as cores das conexões:
-                        if j > i:   # triângulo superior
-                            color='black' # Ligação para caminho a frente
+                        if j > i and start[0] < end[0]:   # Ligação para caminho a frente
+                            color='black'
                             self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
 
-                        if i > j or start[0] > end[0]:  # o triângulo inferior
-                            color='red' # Ligação para realimentação
+                        elif start[0] > end[0]:  # Ligação para realimentação
+                            color='red'
                             self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
 
         else:
@@ -245,12 +245,12 @@ class Grafico:
                         curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
 
                     # Definindo as cores das conexões:
-                    if j > i:   # triângulo superior
-                        color='black' # Ligação para caminho a frente
+                    if j > i and start[0] < end[0]:   # Ligação para caminho a frente
+                        color='black' 
                         self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
 
-                    if i > j or start[0] > end[0]:  # o triângulo inferior
-                        color='red' # Ligação para realimentação
+                    elif start[0] > end[0]:  # Ligação para realimentação
+                        color='red'
                         self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
  
     # Desenha os nós
