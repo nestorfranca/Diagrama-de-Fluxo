@@ -48,7 +48,7 @@ class Grafico:
     # Define coordenada X dos nós:
     def __define_pos_X(self):
         # Inicializa as posições do eixo X em "-1":
-        pesos_x = len(self.self.matriz)*[-1]
+        pesos_x = len(self.matriz)*[-1]
         # [-1,- 1,- 1, ..., -1]
 
         # Define o maior caminho de frente como o caminho principal:
@@ -116,7 +116,7 @@ class Grafico:
     # Define coordenada Y dos nós:
     def __define_pos_Y(self):
         # Inicializa as posições do eixo Y em "None":
-        pesos_y = len(self.self.matriz)*[None]
+        pesos_y = len(self.matriz)*[None]
 
         # Aplica os pesos em Y
         # Define posição Y do maior caminho de frente como 0:
