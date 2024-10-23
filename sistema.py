@@ -12,6 +12,7 @@ s = symbols('s')
 # declarando classe e seus métodos:
 class Sistema:
     def __init__(self, num_sinais):
+        self.num_sinais = num_sinais
         self.inputs = []
         self.matriz = [[0 for _ in range(num_sinais)] for _ in range(num_sinais)] # matriz quadrada
         self.matriz_poly = [[0 for _ in range(num_sinais)] for _ in range(num_sinais)]
