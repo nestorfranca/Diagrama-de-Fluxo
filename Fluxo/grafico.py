@@ -269,8 +269,8 @@ class Grafico:
     # Plota o sistema:
     def draw(self):
         # Plotando o fluxo completo:
-        self.draw_nodes(self.pos, 1, self.transparencia[0])
-        self.draw_connections([], self.transparencia[0])
+        self.draw_nodes(self.pos, 1, self.transparencia[1])
+        self.draw_connections([], self.transparencia[1])
         
         plt.show()
     
@@ -291,5 +291,3 @@ class Grafico:
         self.draw_connections([], self.transparencia[0])
         
         plt.show()
-
-    
