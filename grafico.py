@@ -19,15 +19,15 @@ class Grafico:
         self.ax = None
         self.transparencia = [1, 1]
 
-        self.__setup()
+        self._setup()
 
     # ==================================================
     # MÉTODOS PRIVADOS:
 
     # Configurações da classe:
-    def __setup(self):
+    def setup(self):
 
-        self.pos_x, self.pos_y = self.__define_pos_X(), self.__define_pos_Y()
+        self.pos_x, self.pos_y = self.define_pos_X(), self.define_pos_Y()
 
         self.nos = list(self.sinais.keys())
         # self.pos = dict([self.nos[i], (self.pos_x[i], self.pos_y[i])] for i in range(len(self.nos)))
@@ -46,7 +46,7 @@ class Grafico:
         # ax.set_axis_off()
     
     # Define coordenada X dos nós:
-    def __define_pos_X(self):
+    def define_pos_X(self):
         # Inicializa as posições do eixo X em "-1":
         pesos_x = len(self.matriz)*[-1]
         # [-1,- 1,- 1, ..., -1]
@@ -114,7 +114,7 @@ class Grafico:
         return pesos_x
 
     # Define coordenada Y dos nós:
-    def __define_pos_Y(self):
+    def define_pos_Y(self):
         # Inicializa as posições do eixo Y em "None":
         pesos_y = len(self.matriz)*[None]
 
@@ -183,12 +183,12 @@ class Grafico:
         return pesos_y
 
     # desenha as setas entre os nós:
-    def __draw_arrow(self, ax, start, end, color='black', curvature=0, alpha=1): # Mudar a transparencia dependendo se vai ser mostrado algo ou não
+    def draw_arrow(self, ax, start, end, color='black', curvature=0, alpha=1): # Mudar a transparencia dependendo se vai ser mostrado algo ou não
         ax.annotate('', xy=end, xycoords='data', xytext=start, textcoords='data',
                     arrowprops=dict(arrowstyle="->", lw=1.5, color=color, shrinkA=13, shrinkB=12, connectionstyle=f"arc3,rad={curvature}", alpha=alpha))
 
     # Desenha as linhas de conexão entre os vértices:
-    def __draw_connections(self, vetor_foco = [], alpha = 1): 
+    def draw_connections(self, vetor_foco = [], alpha = 1): 
         
         if len(vetor_foco) != 0:
             
@@ -218,11 +218,11 @@ class Grafico:
                             # Definindo as cores das conexões:
                             if j > i:   # triângulo superior
                                 color='black' # Ligação para caminho a frente
-                                self.__draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
+                                self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
 
                             if i > j or start[0] > end[0]:  # o triângulo inferior
                                 color='red' # Ligação para realimentação
-                                self.__draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
+                                self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
 
         else:
             # Varredura das conexões por todos os vértices:
@@ -251,14 +251,14 @@ class Grafico:
                         # Definindo as cores das conexões:
                         if j > i:   # triângulo superior
                             color='black' # Ligação para caminho a frente
-                            self.__draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
+                            self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
 
                         if i > j or start[0] > end[0]:  # o triângulo inferior
                             color='red' # Ligação para realimentação
-                            self.__draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
+                            self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
  
     # Desenha os nós
-    def __draw_nodes(self, dict, zorder, alpha):
+    def draw_nodes(self, dict, zorder, alpha):
         for label, (x, y) in dict.items():
             self.ax.scatter(x, y, s=400, color='lightblue', edgecolor='black', zorder=zorder, alpha=alpha)  # Ponto do nó => O alpha define a
             self.ax.text(x, y, label, ha='center', va='center', fontsize=12, zorder=zorder, alpha=alpha)  # Rótulo do nó
@@ -270,8 +270,8 @@ class Grafico:
     # Plota o sistema:
     def draw(self):
         # Plotando o fluxo completo:
-        self.__draw_nodes(self.pos, 1, self.transparencia[0])
-        self.__draw_connections([], self.transparencia[0])
+        self.draw_nodes(self.pos, 1, self.transparencia[0])
+        self.draw_connections([], self.transparencia[0])
         
         plt.show()
     
@@ -285,12 +285,12 @@ class Grafico:
             dep_d[self.nos[value]] = tuple([self.pos_x[value], self.pos_y[value]])
         
         # Plotando o caminho em destaque:
-        self.__draw_nodes(dep_d, 2, self.transparencia[1])
-        self.__draw_connections(dep, self.transparencia[1])
+        self.draw_nodes(dep_d, 2, self.transparencia[1])
+        self.draw_connections(dep, self.transparencia[1])
         
         # Plotando o fluxo completo:
-        self.__draw_nodes(self.pos, 1, self.transparencia[0])
-        self.__draw_connections([], self.transparencia[0])
+        self.draw_nodes(self.pos, 1, self.transparencia[0])
+        self.draw_connections([], self.transparencia[0])
         
         plt.show()
 
