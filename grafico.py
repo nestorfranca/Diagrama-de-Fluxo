@@ -18,7 +18,7 @@ class Grafico:
         self.conta_caminhos = 0
 
         self.ax = None
-        self.transparencia = [1, 1]
+        self.transparencia = [0.4, 1]
 
         self.setup()
 
@@ -39,7 +39,8 @@ class Grafico:
         # self.pos = dict([self.nos[i], (self.pos_x[i], self.pos_y[i])] for i in range(len(self.nos)))
         for i in range(len(self.nos)):
             self.pos[self.nos[i]] = (self.pos_x[i], self.pos_y[i])
-
+    
+    def gera_plot(self):
         # Criar a figura e remove os eixos:
         fig, self.ax = plt.subplots(figsize=(len(self.matriz), len(self.matriz)));
         limites = [abs(min(self.pos_y)), abs(max(self.pos_y))];
@@ -275,7 +276,6 @@ class Grafico:
     
     # Plota o caminho em destaque:
     def draw_caminho(self, vetor, valor):
-        self.transparencia[0] = 0.4
         dep = vetor[valor]
 
         dep_d = dict()
@@ -291,5 +291,3 @@ class Grafico:
         self.draw_connections([], self.transparencia[0])
         
         plt.show()
-
-    
