@@ -209,23 +209,21 @@ class Grafico:
                         start = self.pos[self.nos[i]]
                         end = self.pos[self.nos[j]]
                         
-                        for k in range(num_conexoes):
-                            curvature = 0.0
-                            
-                            # adiciona uma curvatura para 'entrar' nas ramificação do caminho de frente:
-                            if k != 0 or abs(start[0] - end[0]) > 1 or ((i in self.principal) ^ (j in self.principal)) or ((start[0] - end[0]) > 0):
-                                curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
-                                if k > 1:
-                                    curvature = -0.5 * k
+                        # for k in range(num_conexoes):
+                        curvature = 0.0
                         
-                            # Definindo as cores das conexões:
-                            if j > i:   # triângulo superior
-                                color='black' # Ligação para caminho a frente
-                                self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
+                        # adiciona uma curvatura para 'entrar' nas ramificação do caminho de frente:
+                        if abs(start[0] - end[0]) > 1 or ((i in self.principal) ^ (j in self.principal)) or ((start[0] - end[0]) > 0):
+                            curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
+                    
+                        # Definindo as cores das conexões:
+                        if j > i:   # triângulo superior
+                            color='black' # Ligação para caminho a frente
+                            self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
 
-                            if i > j or start[0] > end[0]:  # o triângulo inferior
-                                color='red' # Ligação para realimentação
-                                self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
+                        if i > j or start[0] > end[0]:  # o triângulo inferior
+                            color='red' # Ligação para realimentação
+                            self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
 
         else:
             # Varredura das conexões por todos os vértices:
@@ -242,23 +240,20 @@ class Grafico:
                     end = self.pos[self.nos[j]]
                     
 
-                    for k in range(num_conexoes):
-                        curvature = 0.0
-                        
-                        # adiciona uma curvatura para 'entrar' nas ramificação do caminho de frente:
-                        if k != 0 or abs(start[0] - end[0]) > 1 or ((i in self.principal) ^ (j in self.principal)) or ((start[0] - end[0]) > 0):
-                            curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
-                            if k > 1:
-                                curvature = -0.5 * k
+                    curvature = 0.0
+                    
+                    # adiciona uma curvatura para 'entrar' nas ramificação do caminho de frente:
+                    if abs(start[0] - end[0]) > 1 or ((i in self.principal) ^ (j in self.principal)) or ((start[0] - end[0]) > 0):
+                        curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
 
-                        # Definindo as cores das conexões:
-                        if j > i:   # triângulo superior
-                            color='black' # Ligação para caminho a frente
-                            self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
+                    # Definindo as cores das conexões:
+                    if j > i:   # triângulo superior
+                        color='black' # Ligação para caminho a frente
+                        self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
 
-                        if i > j or start[0] > end[0]:  # o triângulo inferior
-                            color='red' # Ligação para realimentação
-                            self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
+                    if i > j or start[0] > end[0]:  # o triângulo inferior
+                        color='red' # Ligação para realimentação
+                        self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
  
     # Desenha os nós
     def draw_nodes(self, dict, zorder, alpha):
