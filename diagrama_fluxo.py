@@ -146,6 +146,8 @@ while True:
 
     elif opc == 7:
         grafico = Grafico(sistema)
+
+        grafico.gera_plot()
         grafico.draw()
 
     else:

@@ -1,3 +1,4 @@
+import numpy as np
 import matplotlib.pyplot as plt
 from sistema import *
 
@@ -6,6 +7,7 @@ class Grafico:
     def __init__(self, sistema):
         self.num_sinais = sistema.num_sinais
         self.matriz = sistema.matriz
+        self.matriz_poly = sistema.matriz_poly
         self.pos_x = []
         self.pos_y = []
         self.nos = []
@@ -13,12 +15,13 @@ class Grafico:
         self.sinais = sistema.sinais
         self.caminhos = sistema.caminhos
         self.lacos = sistema.lacos
+        self.ganho_lacos = sistema.ganho_lacos
         self.principal = None 
         self.max_len = 0
         self.conta_caminhos = 0
 
         self.ax = None
-        self.transparencia = [0.4, 1]
+        self.transparencia = [0.2, 1]
 
         self.setup()
 
@@ -178,10 +181,7 @@ class Grafico:
             
             # distância da coordenada X dos nós de início e fim do laço:
             distancia = self.pos_x[fim] - self.pos_x[inicio]
-            print(f'distancia: {distancia}')
-            print(f'dif: {dif}')
             for d in dif:
-                print(f'd:{d}')
                 pesos_y[d] = round(0.15 * distancia, 2)
 
         return pesos_y
@@ -216,7 +216,6 @@ class Grafico:
                         # adiciona uma curvatura para 'entrar' nas ramificação do caminho de frente:
                         if abs(start[0] - end[0]) > 1 or ((i in self.principal) ^ (j in self.principal)) or ((start[0] - end[0]) > 0):
                             curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
-                    
                         # Definindo as cores das conexões:
                         if j > i:   # triângulo superior
                             color='black' # Ligação para caminho a frente
@@ -234,8 +233,6 @@ class Grafico:
                     if self.matriz[i][j] == 0:   # não tem conexão
                         continue
                     
-                    num_conexoes = self.matriz[i][j]
-
                     # coordenadas dos vértices:
                     start = self.pos[self.nos[i]]
                     end = self.pos[self.nos[j]]
@@ -259,8 +256,8 @@ class Grafico:
     # Desenha os nós
     def draw_nodes(self, dict, zorder, alpha):
         for label, (x, y) in dict.items():
-            self.ax.scatter(x, y, s=400, color='lightblue', edgecolor='black', zorder=zorder, alpha=alpha)  # Ponto do nó => O alpha define a
-            self.ax.text(x, y, label, ha='center', va='center', fontsize=12, zorder=zorder, alpha=alpha)  # Rótulo do nó
+            self.ax.scatter(x, y, s=400, color='lightblue', edgecolor='black', zorder=zorder, alpha=alpha)
+            self.ax.text(x, y, label, ha='center', va='center', fontsize=12, zorder=zorder, alpha=alpha)
 
 
     # ==================================================
