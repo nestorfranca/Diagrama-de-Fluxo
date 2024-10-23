@@ -49,7 +49,7 @@ class Grafico:
         limites = [abs(min(self.pos_y)), abs(max(self.pos_y))];
         limite = max(limites);
         plt.ylim(-limite*2.5, limite*2.5); # Colocar o menor e maior peso para y
-        # ax.set_axis_off()
+        self.ax.set_axis_off()
 
     # Define coordenada X dos nós:
     def define_pos_X(self):
