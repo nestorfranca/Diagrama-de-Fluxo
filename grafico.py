@@ -2,16 +2,17 @@ import matplotlib.pyplot as plt
 from sistema import *
 
 class Grafico:
-    def __init__(self, num_sinais, matriz, sinais, caminhos, lacos):
-        self.num_sinais = num_sinais
-        self.matriz = matriz
+    # def __init__(self, num_sinais, matriz, sinais, caminhos, lacos):
+    def __init__(self, sistema):
+        self.num_sinais = sistema.num_sinais
+        self.matriz = sistema.matriz
         self.pos_x = []
         self.pos_y = []
         self.nos = []
         self.pos = {}
-        self.sinais = sinais
-        self.caminhos = caminhos
-        self.lacos = lacos
+        self.sinais = sistema.sinais
+        self.caminhos = sistema.caminhos
+        self.lacos = sistema.lacos
         self.principal = None 
         self.max_len = 0
         self.conta_caminhos = 0
