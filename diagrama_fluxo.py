@@ -148,8 +148,8 @@ while True:
         grafico = Grafico(sistema)
 
         grafico.gera_plot()
-        # grafico.draw()
-        grafico.draw_caminho(grafico.lacos, 2)
+        grafico.draw()
+        # grafico.draw_caminho(grafico.lacos, 2)
 
     else:
         print('Opção Inválida...'); time.sleep(0.2)

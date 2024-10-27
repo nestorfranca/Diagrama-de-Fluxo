@@ -1,39 +1,43 @@
 import matplotlib.pyplot as plt
-import numpy as np
-from matplotlib.textpath import TextPath
-from matplotlib.patches import PathPatch
-from matplotlib.transforms import Affine2D
 
-# Função da curva (parábola)
-x = np.linspace(0, 10, 100)
-y = 0.1 * (x - 5)**2  # curva parabólica
 
-# Crie o gráfico da curva
-plt.plot(x, y, 'b-')  # curva azul
+def demo_con_style(ax, connectionstyle):
+    x1, y1 = 0.8, 0.6
+    x2, y2 = 0.3, 0.2
 
-# Escolha o ponto intermediário da curva (por exemplo, no meio da lista de pontos)
-idx = len(x) // 2
+    ax.plot([x1, x2], [y1, y2], ".")
+    ax.annotate("",
+                xy=(x1, y1), xycoords='data',
+                xytext=(x2, y2), textcoords='data',
+                arrowprops=dict(arrowstyle="->", color="0.5",
+                                shrinkA=5, shrinkB=5,
+                                patchA=None, patchB=None,
+                                connectionstyle=connectionstyle,
+                                ),
+                )
 
-# Texto a ser colocado
-texto = "Texto na curva"
+    ax.text(.05, .95, connectionstyle.replace(",", ",\n"),
+            transform=ax.transAxes, ha="left", va="top")
 
-# Transforme o texto em um caminho de texto
-text_path = TextPath((0, 0), texto, size=0.5)
 
-# Calcule o ângulo da tangente no ponto escolhido
-angle = np.arctan2(y[idx + 1] - y[idx], x[idx + 1] - x[idx])
+fig, axs = plt.subplots(3, 5, figsize=(7, 6.3), layout="constrained")
+demo_con_style(axs[0, 0], "angle3,angleA=90,angleB=0")
+demo_con_style(axs[1, 0], "angle3,angleA=0,angleB=90")
+demo_con_style(axs[0, 1], "arc3,rad=0.")
+demo_con_style(axs[1, 1], "arc3,rad=0.3")
+demo_con_style(axs[2, 1], "arc3,rad=-0.3")
+demo_con_style(axs[0, 2], "angle,angleA=-90,angleB=180,rad=0")
+demo_con_style(axs[1, 2], "angle,angleA=-90,angleB=180,rad=5")
+demo_con_style(axs[2, 2], "angle,angleA=-90,angleB=10,rad=5")
+demo_con_style(axs[0, 3], "arc,angleA=-90,angleB=0,armA=30,armB=30,rad=0")
+demo_con_style(axs[1, 3], "arc,angleA=-90,angleB=0,armA=30,armB=30,rad=4.5")
+demo_con_style(axs[2, 3], "arc,angleA=-90,angleB=0,armA=0,armB=40,rad=0")
+demo_con_style(axs[0, 4], "bar,fraction=0.3")
+demo_con_style(axs[1, 4], "bar,fraction=-0.3")
+demo_con_style(axs[2, 4], "bar,angle=180,fraction=-0.2")
 
-# Use Affine2D para rotacionar o texto de acordo com a curva e posicioná-lo no ponto escolhido
-trans = Affine2D().rotate(angle).translate(x[idx], y[idx])
-patch = PathPatch(trans.transform_path(text_path), color='black', lw=1)
+for ax in axs.flat:
+    ax.set(xlim=(0, 1), ylim=(0, 1.25), xticks=[], yticks=[], aspect=1.25)
+fig.get_layout_engine().set(wspace=0, hspace=0, w_pad=0, h_pad=0)
 
-# Adicione o texto ao gráfico
-plt.gca().add_patch(patch)
-
-# Ajustes do gráfico
-plt.xlim(0, 10)
-plt.ylim(0, 3)
-plt.gca().set_aspect('equal', adjustable='box')
-
-# Mostre o gráfico
 plt.show()

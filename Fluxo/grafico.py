@@ -48,8 +48,10 @@ class Grafico:
         fig, self.ax = plt.subplots(figsize=(len(self.matriz), len(self.matriz)));
         limites = [abs(min(self.pos_y)), abs(max(self.pos_y))];
         limite = max(limites);
+        self.ax.set_aspect('equal');
+        # plt.grid()
         plt.ylim(-limite*2.5, limite*2.5); # Colocar o menor e maior peso para y
-        self.ax.set_axis_off()
+        # self.ax.set_axis_off()
 
     # Define coordenada X dos nós:
     def define_pos_X(self):
