@@ -78,17 +78,72 @@ class Sistema:
             
         return indices_conj
 
+    # calcula o valor de delta geral:
+    def calcula_delta(self):
+
+        # soma os ganhos:
+        soma_ganho = 0        
+        for i in self.ganho_lacos:
+            soma_ganho -= i
+
+        # print(f'ganho: {soma_ganho}'); time.sleep(3)
+
+        # soma dos ganhos que não se tocam:
+        soma_ganho_nao_tocam = 0
+        for i in self.ganhos_nao_tocam:
+            if i[1]%2 == 0:
+                soma_ganho_nao_tocam += i[0]
+            else: 
+                soma_ganho_nao_tocam -= i[0]
+
+        # print(f'nao_tocam: {soma_ganho_nao_tocam}'); time.sleep(3)
+
+        # return 1 + soma_ganho + soma_ganho_nao_tocam
+        self.delta = 1 + soma_ganho + soma_ganho_nao_tocam
+
+    # calcula o valor de delta para cada caminho:
+    def calcula_delta_k(self):
+        deltas_k = []
+
+        # identifica quem o caminho encosta:
+        for T in self.caminhos:
+            delta_k = self.delta
+            
+            # elimina os ganhos de laço:
+            for id, laco in enumerate(self.lacos):
+                if set(T).intersection(set(laco)):
+                    delta_k += self.ganho_lacos[id]
+            
+            # elimina os ganhos de laço que não se tocam:
+            for id, nao_tocam in enumerate(self.nao_tocam):
+                for laco in nao_tocam:
+
+                    # basta um laço do grupo 'nao_tocam' encostar no caminho
+                    if set(T).intersection(set(laco)):
+                        ganho = self.ganhos_nao_tocam[id]
+                        
+                        if ganho[1]%2 == 0:
+                            delta_k -= ganho[0]
+                        else: 
+                            delta_k += ganho[0]
+                        break
+            
+            # salva o valor de delta do caminho:
+            deltas_k.append(delta_k)
+        
+        return deltas_k
+
     # calcula a FT resultante do sistema e exibe resultado:
     def calcula_FT(self):
         # calcula delta:
-        self.__calcula_delta()
+        self.calcula_delta()
 
         if self.delta == 0:
             print("INDETERMINADO! Delta igual a Zero.")
             return
         
         # valores de delta de cada caminho:        
-        deltas_k = self.__calcula_delta_k()
+        deltas_k = self.calcula_delta_k()
 
         # calcula FT equivalente:
         sum = 0
@@ -97,8 +152,8 @@ class Sistema:
         
         FT = sum/self.delta
         
-        print(pretty(simplify(FT)))
-    
+        return FT
+
     # informações gerais do sistema:
     def status(self):
 
@@ -138,8 +193,20 @@ class Sistema:
     def exibe_matriz(self, matriz):
         print(f'\n{pretty(Matrix(matriz))}')
 
+    # exibe os valores da lista inserida, separados por um marcador
+    def exibe_lista(self, lista, marcador, trava = False):
+        for id1, item in enumerate(lista):
+            print(f'{id1+1}. ', end='')
+            for id2, v in enumerate(item):
+                print(v, end=f' {marcador} ' if id2 < len(item) - 1 else '\n')      
+            
+            if trava:
+                yield
+
     # gera uma nova conexão entre sinais:
     def adiciona_conexao(self, conexoes):
+        inputs_adicionados = []
+        inputs = []
         # remove os espaços em branco:
         lista_sem_espacos = conexoes.replace(' ', '')
         
@@ -167,14 +234,20 @@ class Sistema:
                 # return
                 continue
             
+            # cria a conexão (inicialmente, os ganhos também são unitários):
+            if conexao in inputs_adicionados:
+                self.matriz[sinal1][sinal2] += 1
+                self.matriz_poly[sinal1][sinal2] += 1   
+            else:
+                self.matriz[sinal1][sinal2] = 1
+                self.matriz_poly[sinal1][sinal2] = 1
+
             # armazena os inputs:
-            self.inputs.append(tuple([sinal1_k, sinal2_k]))
-
-            # cria a conexão:
-            self.matriz[sinal1][sinal2] += 1
-
-            # inicialmente, os ganhos da matriz_poly são unitários:
-            self.matriz_poly[sinal1][sinal2] += 1   
+            inputs_adicionados.append(conexao)
+            inputs.append(tuple([sinal1_k, sinal2_k]))
+        
+        # atualiza lista de inputs:
+        self.inputs = inputs
         
         # atualiza informações do sistema:
         self.__setup()
@@ -198,7 +271,6 @@ class Sistema:
             if ((sinal1) > len(self.matriz_poly)-1 or (sinal2) > len(self.matriz_poly)-1) or sinal1 == sinal2:
                 continue
             
-
             if conexao in inputs_adicionados:
                 self.matriz_poly[sinal1][sinal2] += sympify(eq)
             else:
@@ -208,20 +280,25 @@ class Sistema:
 
         self.__setup_ganhos()
 
+
     # ==================================================
-    # MÉTODOS PRIVADOS (MÉTODOS AUXILIARES)
+    # MÉTODOS PRIVADOS
 
     # MÉTODOS DE CONTROLE:
     
-    # atualiza confirurações gerais:
+    # Atualiza confirurações gerais:
     def __setup(self):
+        '''Atualiza confirurações gerais'''
+
         self.__atualiza_sinais()
         self.__atualiza_caminhos()
         self.__atualiza_lacos()
         self.__atualiza_lacos_nao_se_tocam()
 
-    # atualiza a lista de sinais
+    # Atualiza a lista de sinais
     def __atualiza_sinais(self):
+        '''Atualiza a lista de sinais'''
+        
         # tamanho da matriz:
         len_matriz = len(self.matriz)
 
@@ -236,8 +313,9 @@ class Sistema:
         
             self.sinais = dict(sinais)
 
-    # atualiza a lista de caminhos:
+    # Atualiza a lista de caminhos:
     def __atualiza_caminhos(self):
+        '''Atualiza a lista de caminhos'''
         # matriz_up = self.matriz.upper_triangular()
 
         caminhos = []
@@ -248,8 +326,10 @@ class Sistema:
         # Atualiza lista de caminhos:           
         self.caminhos = caminhos
 
-    # atualiza a lista de lacos:
+    # Atualiza a lista de lacos:
     def __atualiza_lacos(self):
+        '''Atualiza a lista de lacos'''
+
         lacos = []
 
         # Começar a busca do nó 0
@@ -259,7 +339,8 @@ class Sistema:
     
     # Verifica as combinações de laços que não se tocam:
     def __verifica_colisao(self, vetor):
-        
+        '''Verifica as combinações de laços que não se tocam'''
+
         # teste todos os pares de conjuntos dentro do vetor:
         for conjunto1 in vetor:
             for conjunto2 in vetor:
@@ -274,8 +355,10 @@ class Sistema:
                     
         return False
 
+    # Gera uma combinação de laços que não possuem sinais em comum:
     def __atualiza_lacos_nao_se_tocam(self):
-
+        '''Gera uma combinação de laços que não possuem sinais em comum'''
+        
         # método que retorna uma lista de combinação
         comb = list(chain.from_iterable(
             combinations(self.lacos, r) for r in range(1, len(self.lacos) + 1)
@@ -294,26 +377,29 @@ class Sistema:
         # atualiza atributo:
         self.nao_tocam = nao_tocam
     
-    # atualiza os atributos de ganho
+    # Atualiza os atributos de ganho:
     def __setup_ganhos(self):
+        '''Atualiza os atributos de ganho'''
+
         self.__ganho_caminho_frente()
         self.__ganho_laco()
         self.__ganho_nao_tocam()
 
-
-
-    # FUNÇÕES AUXILIARES PARA CALCULAR A FT EQUIVALENTE:
-
     # Calcula os ganhos de caminho à frente:
     def __ganho_caminho_frente(self):
+        '''Calcula os ganhos de caminho à frente'''
+
         self.ganho_caminhos = self.__multiplica(self.caminhos)
 
     # Calcula os ganhos de laço:
     def __ganho_laco(self):
+        '''Calcula os ganhos de laço'''
+
         self.ganho_lacos = self.__multiplica(self.lacos)
     
     # Calcula os ganhos de laço que não se tocam:
     def __ganho_nao_tocam(self):
+        '''Calcula os ganhos de laço que não se tocam'''
         
         ganhos_nao_tocam = []
         for i in self.nao_tocam:
@@ -327,74 +413,13 @@ class Sistema:
             
         self.ganhos_nao_tocam = ganhos_nao_tocam
 
-    # calcula o valor de delta geral:
-    def __calcula_delta(self):
-
-        # soma os ganhos:
-        soma_ganho = 0        
-        for i in self.ganho_lacos:
-            soma_ganho -= i
-
-        # print(f'ganho: {soma_ganho}'); time.sleep(3)
-
-        # soma dos ganhos que não se tocam:
-        soma_ganho_nao_tocam = 0
-        for i in self.ganhos_nao_tocam:
-            if i[1]%2 == 0:
-                soma_ganho_nao_tocam += i[0]
-            else: 
-                soma_ganho_nao_tocam -= i[0]
-
-        # print(f'nao_tocam: {soma_ganho_nao_tocam}'); time.sleep(3)
-
-        self.delta = 1 + soma_ganho + soma_ganho_nao_tocam
-
-    # calcula o valor de delta para cada caminho:
-    def __calcula_delta_k(self):
-        deltas_k = []
-
-        # identifica quem o caminho encosta:
-        for T in self.caminhos:
-            delta_k = self.delta
-            
-            # elimina os ganhos de laço:
-            for id, laco in enumerate(self.lacos):
-                if set(T).intersection(set(laco)):
-                    delta_k += self.ganho_lacos[id]
-            
-            # elimina os ganhos de laço que não se tocam:
-            for id, nao_tocam in enumerate(self.nao_tocam):
-                for laco in nao_tocam:
-
-                    # basta um laço do grupo 'nao_tocam' encostar no caminho
-                    if set(T).intersection(set(laco)):
-                        ganho = self.ganhos_nao_tocam[id]
-                        
-                        if ganho[1]%2 == 0:
-                            delta_k -= ganho[0]
-                        else: 
-                            delta_k += ganho[0]
-                        break
-            
-            # salva o valor de delta do caminho:
-            deltas_k.append(delta_k)
-        
-        return deltas_k
-
+    
     # MÉTODOS AUXILIARES:
     
-    # exibe os valores da lista inserida, separados por um marcador
-    def exibe_lista(self, lista, marcador, trava = False):
-        for id1, item in enumerate(lista):
-            print(f'{id1+1}. ', end='')
-            for id2, v in enumerate(item):
-                print(v, end=f' {marcador} ' if id2 < len(item) - 1 else '\n')      
-            
-            if trava:
-                yield
-
-    # busca todos os caminhos à frente possíveis:
+    # Busca todos os caminhos à frente possíveis:
     def __encontra_caminho(self, mat, lista_init):
+        '''Busca todos os caminhos à frente possíveis'''
+
         # copia a lista de entrada:
         lista_caminhos = lista_init.copy()
         
@@ -427,8 +452,10 @@ class Sistema:
             
         return lista_caminhos
 
-    # busca todos os laços possíveis:
+    # Busca todos os laços possíveis:
     def __encontra_laco(self, mat, lista_init):
+        '''Busca todos os laços possíveis'''
+
         # copia a lista de entrada:
         lista_lacos = lista_init.copy()
         
@@ -481,8 +508,10 @@ class Sistema:
 
         return lista_lacos
 
-    # realiza uma multiplicação dos ganhos entre as conexões listadas:
+    # Realiza uma multiplicação dos ganhos entre as conexões listadas:
     def __multiplica(self, lista_conex):
+        '''Realiza uma multiplicação dos ganhos entre as conexões listadas'''
+        
         ganhos = []
         for i in lista_conex:
             ganho = 1
