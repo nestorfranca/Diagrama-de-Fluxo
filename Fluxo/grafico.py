@@ -1,4 +1,4 @@
-import numpy as np
+import math, numpy as np
 import matplotlib.pyplot as plt
 from sistema import *
 
@@ -46,12 +46,13 @@ class Grafico:
     def gera_plot(self):
         # Criar a figura e remove os eixos:
         fig, self.ax = plt.subplots(figsize=(len(self.matriz), len(self.matriz)));
-        limites = [abs(min(self.pos_y)), abs(max(self.pos_y))];
-        limite = max(limites);
+        
+        # define o limite Y com base na maior altura possível de ocorrer:
+        limite = self.pos_x[-1]/2
         self.ax.set_aspect('equal');
         # plt.grid()
-        plt.ylim(-limite*2.5, limite*2.5); # Colocar o menor e maior peso para y
-        # self.ax.set_axis_off()
+        plt.ylim(-limite*1.25, limite*1.25); # Colocar o menor e maior peso para y
+        self.ax.set_axis_off()
 
     # Define coordenada X dos nós:
     def define_pos_X(self):
@@ -130,7 +131,7 @@ class Grafico:
         # Define posição Y do maior caminho de frente como 0:
         for i in self.principal:
             pesos_y[i] = 0
-        # [0, 0, 0, 0, 0, -1, -1, -1, 0]
+        # [0, 0, 0, 0, 0, 0, None, None, None, 0]
 
         # Define posição do eixo Y das ramificações do caminho de frente principal:
         for value in self.caminhos:
@@ -158,7 +159,7 @@ class Grafico:
             # distância da coordenada X dos nós de início e fim da ramificação:
             distancia = self.pos_x[fim] - self.pos_x[inicio]
             for d in dif:
-                pesos_y[d] = round(0.15 * distancia, 2)
+                pesos_y[d] = round(0.5 * distancia, 2)
 
         # Define posição do eixo Y dos laços:
         for value in self.lacos:
@@ -184,14 +185,44 @@ class Grafico:
             # distância da coordenada X dos nós de início e fim do laço:
             distancia = self.pos_x[fim] - self.pos_x[inicio]
             for d in dif:
-                pesos_y[d] = round(0.15 * distancia, 2)
+                pesos_y[d] = round(0.5 * distancia, 2)
 
         return pesos_y
 
     # desenha as setas entre os nós:
-    def draw_arrow(self, ax, start, end, color='black', curvature=0, alpha=1): # Mudar a transparencia dependendo se vai ser mostrado algo ou não
+    def draw_arrow(self, ganho, ax, start, end, color='black', curvature=0, alpha=1): # Mudar a transparencia dependendo se vai ser mostrado algo ou não
         ax.annotate('', xy=end, xycoords='data', xytext=start, textcoords='data',
                     arrowprops=dict(arrowstyle="->", lw=1.5, color=color, shrinkA=13, shrinkB=12, connectionstyle=f"arc3,rad={curvature}", alpha=alpha))
+        
+        # Texto:
+        altura = -(curvature * (math.dist(start, end)) / 2)
+        deg = math.atan2((end[1] - start[1]), (end[0] - start[0]))
+
+        mid_x = (start[0] + end[0]) / 2
+        mid_y = (start[1] + end[1]) / 2
+
+        text_pos_x = mid_x
+        text_pos_y = mid_y
+        if curvature == 0:
+            text_pos_x = mid_x
+            text_pos_y = mid_y #+ 0.1
+
+        else:
+            if deg != 0 and deg != math.pi:
+                text_pos_x = mid_x - altura*math.sin(deg) #+ (0.1 if math.tan(deg) > 0 else -0.1)
+            
+            text_pos_y = mid_y + altura*math.cos(deg) #+ (0.1 if math.cos(deg) > 0 else -0.1)
+
+        
+        ax.annotate(pretty(ganho), 
+            xy=end,       # Ponto final da seta
+            xytext=(text_pos_x, text_pos_y),   # Posição do texto no meio da seta
+            # xytext=(mid_x, mid_y),   # Posição do texto no meio da seta
+            ha='center', va='center',
+            fontsize=5,  # Tamanho da fonte
+            color='black',  # Cor do texto
+            fontweight='bold',  # Estilo do texto (negrito)
+            bbox=dict(facecolor='white', edgecolor='gray', boxstyle='round,pad=0.3', alpha=0.75))  # Estilo da caixa
 
     # Desenha as linhas de conexão entre os vértices:
     def draw_connections(self, vetor_foco = [], alpha = 1): 
@@ -214,18 +245,23 @@ class Grafico:
                         
                         # for k in range(num_conexoes):
                         curvature = 0.0
+                        G = self.matriz_poly[i][j]
                         
-                        # adiciona uma curvatura para 'entrar' nas ramificação do caminho de frente:
-                        if abs(start[0] - end[0]) > 1 or ((i in self.principal) ^ (j in self.principal)) or ((start[0] - end[0]) > 0):
-                            curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
-                        # Definindo as cores das conexões:
-                        if j > i and start[0] < end[0]:   # Ligação para caminho a frente
-                            color='black'
-                            self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
+                        # curvatura para ramificações do caminho de frente:
+                        if (end[0] - start[0]) > 1 or ((i in self.principal) ^ (j in self.principal)):
+                            curvature = -0.5
+                        
+                        # curvatura para laços:
+                        if (end[0] - start[0]) < 0 and ((i in self.principal) or (j in self.principal)):
+                            curvature = -0.5
 
+                        # Definindo as cores das conexões:
+                        if start[0] < end[0]:   # Ligação para caminho a frente
+                            color='black'
                         elif start[0] > end[0]:  # Ligação para realimentação
                             color='red'
-                            self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
+                        
+                        self.draw_arrow(G, self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
 
         else:
             # Varredura das conexões por todos os vértices:
@@ -241,19 +277,24 @@ class Grafico:
                     
 
                     curvature = 0.0
+                    G = self.matriz_poly[i][j]
                     
-                    # adiciona uma curvatura para 'entrar' nas ramificação do caminho de frente:
-                    if abs(start[0] - end[0]) > 1 or ((i in self.principal) ^ (j in self.principal)) or ((start[0] - end[0]) > 0):
-                        curvature = -0.5 if abs(start[0] - end[0]) > 0 else 0
+                    # curvatura para ramificações do caminho de frente:
+                    if (end[0] - start[0]) > 1 or ((i in self.principal) ^ (j in self.principal)):
+                        curvature = -0.5
+                    
+                    # curvatura para laços:
+                    if (end[0] - start[0]) < 0 and ((i in self.principal) or (j in self.principal)):
+                        curvature = -0.5
 
                     # Definindo as cores das conexões:
-                    if j > i and start[0] < end[0]:   # Ligação para caminho a frente
+                    if start[0] < end[0]:   # Ligação para caminho a frente
                         color='black' 
-                        self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparencia
 
                     elif start[0] > end[0]:  # Ligação para realimentação
                         color='red'
-                        self.draw_arrow(self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
+                    
+                    self.draw_arrow(G, self.ax, start, end, color, curvature=curvature, alpha=alpha) # Colocar a transparência
  
     # Desenha os nós
     def draw_nodes(self, dict, zorder, alpha):

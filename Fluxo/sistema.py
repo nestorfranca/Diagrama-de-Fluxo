@@ -442,10 +442,22 @@ class Sistema:
             ult_vertice = candidato[-1]
 
             novos_caminhos = []
-            for i in range(ult_vertice, len(mat)):
-                if mat[ult_vertice][i] != 0:
-                    # adiciona o nova combinação a lista de novas caminhos:
-                    novos_caminhos.append(candidato + [i])
+            for i in range(len(mat)):
+
+                if mat[ult_vertice][i] == 0:
+                    continue
+                
+                novo_caminho = candidato + [i]
+                
+                # caso tenha virado um laço, novo_caminho é ignorado:
+                eLaco = False
+                for index, valor in enumerate(novo_caminho):
+                    if novo_caminho.count(valor) > 1:
+                        eLaco = True
+
+                # adiciona o nova combinação a lista de novas caminhos:
+                if not eLaco:
+                    novos_caminhos.append(novo_caminho)
 
             # adiciona a nova combinação à lista de combinações
             lista_caminhos += novos_caminhos
@@ -480,28 +492,29 @@ class Sistema:
             novas_comb = []
             for i in range(len(mat)):
 
-                if mat[ult_vertice][i] != 0:
+                if mat[ult_vertice][i] == 0:
+                    continue
                     
-                    novo_laco = candidato + [i]
+                novo_laco = candidato + [i]
 
-                    # verifica se é um laço:
-                    for index, valor in enumerate(novo_laco):
+                # verifica se é um laço:
+                for index, valor in enumerate(novo_laco):
 
-                        # se achar um laço, remove os valores em excesso:
-                        # Ex.: [0, 1, 2, 3, 4, 2] ==> [2, 3, 4, 2]
-                        if novo_laco.count(valor) > 1:
-                            novo_laco = novo_laco[index:]
-                            break
-                        
-                    # verifica se já não existe o laço:
-                    repetido = False
-                    for laco in lista_lacos:
-                        if set(novo_laco) == set(laco):
-                            repetido = True
+                    # se achar um laço, remove os valores em excesso:
+                    # Ex.: [0, 1, 2, 3, 4, 2] ==> [2, 3, 4, 2]
+                    if novo_laco.count(valor) > 1:
+                        novo_laco = novo_laco[index:]
+                        break
+                    
+                # verifica se já não existe o laço:
+                repetido = False
+                for laco in lista_lacos:
+                    if set(novo_laco) == set(laco):
+                        repetido = True
 
-                    # adiciona o nova combinação a lista de novas lacos:
-                    if not repetido:
-                        novas_comb.append(novo_laco)
+                # adiciona o nova combinação a lista de novas lacos:
+                if not repetido:
+                    novas_comb.append(novo_laco)
 
             # adiciona a nova combinação à lista de combinações
             lista_lacos += novas_comb
